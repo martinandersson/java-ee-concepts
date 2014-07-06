@@ -5,8 +5,20 @@
     <groupId>com.martinandersson.javaee</groupId>
     <artifactId>java-ee-concepts</artifactId>
     <version>1.0.0-SNAPSHOT</version>
-    <packaging>ejb</packaging>
-
+    
+    <!--
+        If and when java source code files are added to "./src/main/java", ejb
+        packaging will probably be used like so:
+        
+        <packaging>ejb</packaging>
+        
+        With no packaging declared, it defaults to "jar". It wouldn't hurt to
+        have ejb packaging declared in this POM file even with no java source
+        code files, but a Maven EJB plugin bug exist that will crash the build:
+        
+        https://jira.codehaus.org/browse/MEJB-50
+    -->
+    
     <name>Java EE Concepts</name>
     <description>
         A Java Maven project using Arqullian to explore Java EE concepts.
