@@ -1,4 +1,4 @@
 /**
- * Package for all programmatically deployable resources.
+ * Package for programmatically deployable server resources.
  */
 package com.martinandersson.javaee.resources;
