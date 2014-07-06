@@ -1,5 +1,5 @@
 Java EE Concepts
-================
+---
 
 A Java Maven project using Arqullian to explore Java EE concepts.
 
@@ -11,8 +11,13 @@ Each package illustrate a Java EE concept and provide elaborative top-notch comm
 
 Next stop, read:
 
-    ./test/java/com/martinandersson/javaee/arquillian/package-info.java
+[./test/java/com/martinandersson/javaee/arquillian/package-info.java](https://github.com/MartinanderssonDotcom/java-ee-concepts/blob/master/src/test/java/com/martinandersson/javaee/arquillian/package-info.java)
+
+Required of you
+---
+* JDK 8
+* Either GlassFish 4 or WildFly 8 installed and running
 
 Contributors
-===
+---
 Martin Andersson (webmaster@martinandersson.com)
