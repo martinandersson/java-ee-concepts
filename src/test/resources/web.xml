@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+    This file is currently not used and provided only for reference.
+    See the PersistenceTest.java file in package "persistence".
+-->
+
+<web-app version="3.1"
+         xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd">
+    <data-source>
+        <name>java:app/env/ArquillianDS</name>
+        <class-name>org.apache.derby.jdbc.ClientXADataSource</class-name>
+        <server-name>localhost</server-name>
+        <port-number>1527</port-number>
+        <database-name>arquillian-test-db</database-name>
+        <user>app</user>
+        <password>app</password>
+        <property>
+            <name>connectionAttributes</name>
+            <value>;create=true</value>
+        </property>
+    </data-source>
+</web-app>

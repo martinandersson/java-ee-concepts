@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+    See the JPA 2.1 specification, section 8.1 for more information:
+        https://jcp.org/en/jsr/detail?id=338
+    
+    How-to package this file is better described here:
+        http://docs.oracle.com/javaee/7/tutorial/doc/persistence-intro003.htm#BNBRJ
+-->
+
+<persistence
+    version="2.1"
+    xmlns="http://xmlns.jcp.org/xml/ns/persistence"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd">
+
+<!--
+
+    If you're using JPA 2.0, note that schema locations moved in 2.1. Old school:
+    
+<persistence
+    version="2.0"
+    xmlns="http://xmlns.jcp.org/xml/ns/persistence"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd">
+-->
+
+  <!-- transaction-type defaults to JTA in Java EE environments, but no harm in being explicit: -->
+  <persistence-unit name="arquillian-pu" transaction-type="JTA">
+    <!--
+        Java EE 7 requires of a server that he has a "default data source"
+        already defined that developers can use like so:
+        
+        <jta-data-source>java:comp/DefaultDataSource</jta-data-source>
+        
+        See more here: https://blogs.oracle.com/arungupta/entry/default_datasource_in_java_ee
+        
+        The default data source of GlassFish 4 is a network accessed Java DB on
+        port 1527 targeting the database named "sun-appserv-samples".
+        
+        Given the "configuration by exeception" (or "convention over
+        configuration") principle, one should be able to use the default data
+        source without even referencing it, making it possible to leave almost
+        the entire persistence.xml file empty.
+        
+        GlassFish 4 has the default data source defined, WildFly is a big no no.
+        The developers of WildFly won't accept the provided JNDI name, arguing
+        that during parsing of persistence.xml, there is no "java:comp" scope
+        defined (note 1), and as of today, WildFly has no default data source.
+        Even though the Java EE 7 specification require the default data source,
+        the TCK (suite of tests to check for JSR compliance) never ran a check
+        for this most anticipated feature so WildFly is still considered a Java
+        EE 7 compatible server.
+        
+        For maximum portability, we define our own data source here.
+    -->
+    <jta-data-source>java:app/env/ArquillianDS</jta-data-source>
+    
+    <!-- Make all annotated entities part of this unit configuration: -->
+    <exclude-unlisted-classes>false</exclude-unlisted-classes>
+    
+    <!-- If provider has a second-level cache, make all entities use it unless annotated otherwise: -->
+    <shared-cache-mode>DISABLE_SELECTIVE</shared-cache-mode>
+    
+    <properties>
+        <!--
+            JPA 2.1 (EE 7) has introduced a property for DDL generation:
+            
+            <property name="javax.persistence.schema-generation.database.action" value="create"/>
+        
+            However, there is no "update" value one could use which is the value
+            we want to use during development. On all subsequent runs of our
+            persistence test, and if we use the previously cited property and
+            value, EclipseLink won't try to recreate already created tables and
+            everything will be just fine. However, Hibernate is a bit more picky
+            about it and will crash with the "error" message that the tables he
+            want to create already exists. So for our use case, we must fall
+            back to vendor specific properties:
+        -->
+        <property name="hibernate.hbm2ddl.auto" value="update"/>
+        <property name="eclipselink.ddl-generation" value="create-or-extend-tables"/>
+        
+        <!--
+            These properties are not standardized but should always be provided.
+            More info: http://stackoverflow.com/a/24461246/1268003
+        -->
+        <property name="hibernate.dialect" value="org.hibernate.dialect.DerbyTenSevenDialect"/>
+        <property name="eclipselink.target-database" value="JavaDB"/>
+        
+        <!-- Is nighthack for WildFly: https://issues.jboss.org/browse/WFLY-2727 -->
+        <property name="wildfly.jpa.twophasebootstrap" value="false" />
+    </properties>
+  </persistence-unit>
+</persistence>
+
+<!--
+    Note 1: https://issues.jboss.org/browse/WFLY-2680
+-->
