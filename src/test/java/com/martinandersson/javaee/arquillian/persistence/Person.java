@@ -20,7 +20,7 @@ import javax.persistence.Version;
  * @author Martin Andersson (webmaster at martinandersson.com)
  */
 @Entity
-public class Person
+public class Person // note 1
 {
     @Id
     @GeneratedValue
@@ -84,3 +84,14 @@ public class Person
                 .toString();
     }
 }
+
+/*
+ * NOTE 1: It is always a good idea to make the entity implement Serializable.
+ *         However, it is not required until the day comes when the entity needs
+ *         to be serialized. JPA 2.1 specification, section 2.1 ("The Entity
+ *         Class"):
+ *         
+ *             "If an entity instance is to be passed by value as a detached
+ *              object (e.g., through a remote interface), the entity class must
+ *              implement the Serializable interface."
+ */
