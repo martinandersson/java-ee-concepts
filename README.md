@@ -9,8 +9,7 @@ This project, as was the creator's original intent, suits well for Java EE educa
 
 Each package illustrate a Java EE concept and provide elaborative kickass comments that explain everything of relevance with quotes and references to Java EE specifications and other litterature. The test classes will "prove" what really happens on the inside of a Java EE application server. These tests execute without any hassle right in your IDE.
 
-Next stop, read:
-
+Next stop, read:   
 [./test/java/com/martinandersson/javaee/arquillian/package-info.java](https://github.com/MartinanderssonDotcom/java-ee-concepts/blob/master/src/test/java/com/martinandersson/javaee/arquillian/package-info.java)
 
 Required of you
