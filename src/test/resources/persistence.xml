@@ -69,13 +69,24 @@
             <property name="javax.persistence.schema-generation.database.action" value="create"/>
         
             However, there is no "update" value one could use which is the value
-            we want to use during development. On all subsequent runs of our
-            persistence test, and if we use the previously cited property and
-            value, EclipseLink won't try to recreate already created tables and
-            everything will be just fine. However, Hibernate is a bit more picky
-            about it and will crash with the "error" message that the tables he
-            want to create already exists. So for our use case, we must fall
-            back to vendor specific properties:
+            we want to use for the purpose of working on durable entities. On
+            all subsequent runs of our persistence test, and if we use the
+            previously cited property and value, EclipseLink won't try to
+            recreate already created tables and everything will be just fine.
+            However, Hibernate is a bit more picky about it and will crash with
+            the "error" message that the tables he want to create already
+            exists. So for our use case, we must fall back to vendor specific
+            properties.
+            
+            Another value often used in the standard property is
+            "drop-and-create". EclipseLink do what he's supposed to do.
+            Hibernate on the other hand does not "drop" first and will therefore
+            crash, complaining about tables that already exist. See:
+            
+                https://hibernate.atlassian.net/browse/HHH-9181
+            
+            So as of today, if you want to build portable applications, the JPA
+            2.1 schema generation properties seem to be useless.
         -->
         <property name="hibernate.hbm2ddl.auto" value="update"/>
         <property name="eclipselink.ddl-generation" value="create-or-extend-tables"/>
