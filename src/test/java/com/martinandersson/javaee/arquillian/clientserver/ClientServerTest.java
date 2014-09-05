@@ -155,7 +155,7 @@ public class ClientServerTest
          * a method for doing so has been provided a bit further down. For
          * example, the next try-catch could be replaced with:
          * 
-         *     makeGETRequest(helloServlet, true, "hello=world");
+         *     makeGETRequest(helloServlet, "hello=world");
          */
         
         // Possible IOException:
@@ -219,7 +219,7 @@ public class ClientServerTest
      * 
      * @see escape(String, String)
      */
-    private String[] makeGETRequest(URL url, boolean log, String... parameters) throws IOException
+    private String[] makeGETRequest(URL url, String... parameters) throws IOException
     {
         final int    port  = url.getPort();
         final String host  = url.getHost(),
@@ -243,9 +243,6 @@ public class ClientServerTest
                .append("User-Agent: An awesome Java Socket") .append(CRLF)
                .append(CRLF).toString();
         
-        if (log)
-            LOGGER.info(() -> "WILL SEND REQUEST: \n\t" + request.replace("\n", "\n\t"));
-        
         try (Socket socket = new Socket(host, port > 0 ? port : 80);
              PrintWriter out = new PrintWriter(new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8), false);
              BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8)))
@@ -255,12 +252,7 @@ public class ClientServerTest
             out.write(request);
             out.flush();
             
-            final String[] response = in.lines().toArray(String[]::new);
-            
-            if (log)
-                LOGGER.info(() -> "GOT RESPONSE: \n\t" + Stream.of(response).collect(Collectors.joining("\n\t", "", "")));
-            
-            return response;
+            return in.lines().toArray(String[]::new);
         }
     }
     
