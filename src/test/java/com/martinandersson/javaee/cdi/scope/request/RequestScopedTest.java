@@ -264,7 +264,7 @@ public class RequestScopedTest
      * Will assert that all @RequestScoped bean Id:s are the same, independently
      * of where the bean was injected.
      * 
-     * @param report the test report, as provided by {@code TestDriver}
+     * @param report the test report, as provided by {@code TestDriver1}
      */
     private void assertTestReport(TestDriver1.Report report) {
         assertEquals("Expected same @RequestScoped bean injected in Servlet as the one nested inside.",
