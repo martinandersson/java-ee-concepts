@@ -16,7 +16,8 @@
 
 <!--
 
-    If you're using JPA 2.0, note that schema locations moved in 2.1. Old school:
+    If you're using JPA 2.0 (Java EE 6), note that schema locations has moved in
+    version 2.1 (Java EE 7). Old school:
     
 <persistence
     version="2.0"
@@ -64,7 +65,7 @@
     
     <properties>
         <!--
-            JPA 2.1 (EE 7) has introduced a property for DDL generation:
+            JPA 2.1 (Java EE 7) has introduced a property for DDL generation:
             
             <property name="javax.persistence.schema-generation.database.action" value="create"/>
         
