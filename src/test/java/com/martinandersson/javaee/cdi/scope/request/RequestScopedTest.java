@@ -231,9 +231,10 @@ public class RequestScopedTest
      */
     
     /**
-     * Will make a HTTP GET-request to the {@code TestDriver}.
+     * Will make a HTTP GET-request to the provided test driver.
      * 
      * @param url deployed application URL, provided by Arquillian
+     * @param testDriverType the test driver class
      * 
      * @return the test report, as provided by {@code TestDriver}
      */
