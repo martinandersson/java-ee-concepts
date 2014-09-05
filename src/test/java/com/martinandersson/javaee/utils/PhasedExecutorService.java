@@ -97,6 +97,10 @@ public class PhasedExecutorService implements ExecutorService
         });
     }
     
+    public PhasedExecutorService(ThreadFactory threadFactory) {
+        this(Runtime.getRuntime().availableProcessors(), threadFactory);
+    }
+    
     public PhasedExecutorService(int threadCount, ThreadFactory threadFactory) {
         if (Runtime.getRuntime().availableProcessors() < 2)
             throw new IllegalStateException("Impossible to execute provided tasks in parallel. You have to few CPU:s lol.");
@@ -110,6 +114,15 @@ public class PhasedExecutorService implements ExecutorService
     }
     
     
+    
+    /**
+     * Returns the used thread count.
+     * 
+     * @return the used thread count
+     */
+    public int getThreadCount() {
+        return threadCount;
+    }
     
     @Override
     public void shutdown() {
