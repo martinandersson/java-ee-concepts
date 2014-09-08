@@ -218,6 +218,10 @@ public class ClientServerTest
      * @return one String for each line Server responded
      * 
      * @see escape(String, String)
+     * 
+     * @deprecated
+     * Before using this method, move it to
+     * {@linkplain com.martinandersson.javaee.utils.HttpRequests}.
      */
     private String[] makeGETRequest(URL url, String... parameters) throws IOException
     {
