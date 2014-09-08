@@ -185,16 +185,17 @@
  * Java has a built-in awesome datatype to use for storage of thread local
  * objects: {@linkplain java.lang.ThreadLocal}. But this type has no way to
  * propagate across different threads. {@linkplain
- * java.lang.InheritableThreadLocal}, which the CDI implementation will probably
- * use, is an alternative that may propagate from a parent thread to a
- * parent-spawned child thread. Propagating an object to a completely foreign
- * thread that has no relationship with the "caller" requires a bit more
- * sophisticated code. That would also require a "sophisticated specification",
- * adding way to much complexity into the game trying to repair things that
- * brake. For example, the foreign thread might execute his logic so far away
- * into the future that the callee's context that was active during invocation
- * of the asynchronous method is no longer active when the foreign thread
- * finally is scheduled for work.<p>
+ * java.lang.InheritableThreadLocal}, is an alternative that may propagate from
+ * a parent thread to a parent-spawned child thread. Propagating an object to a
+ * completely foreign thread that has no relationship with the "caller" requires
+ * a bit more sophisticated code but it is completely doable (for example, see
+ * {@code BlockingQueue<E>}).<p>
+ * 
+ * The real problem is submitting pieces of logic to a thread pool for execution
+ * in the future. For example, the worker thread might execute the logic so far
+ * away into the future that the callee's context that was active during
+ * invocation of the asynchronous method is no longer active when the worker
+ * thread finally is scheduled for work.<p>
  * 
  * In order to keep things simple and leave the programmer with an intact, not
  * too hard to understand programming model, contexts and scopes are specified
@@ -212,7 +213,10 @@
  * 
  * Don't get this quote wrong. The scope, or rather the context object
  * associated with the scope, might not <i>propagate</i> but the scope may be
- * active. See test
+ * active. Therefore, a client might successfully {@code @Inject} a
+ * {@code @RequestScoped} bean because the "context is active", but the instance
+ * he receive is a new instance, not an old one because the previous context did
+ * not propagate. See test
  * {@linkplain com.martinandersson.javaee.cdi.scope.request.RequestScopedTest#contextDoesNotPropagateAcrossAsynchronousEJB(java.net.URL)
  * RequestScopedTest.contextDoesNotPropagateAcrossAsynchronousEJB()}.<p>
  * 

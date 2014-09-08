@@ -1,12 +1,9 @@
 package com.martinandersson.javaee.cdi.scope.request;
 
-import com.martinandersson.javaee.utils.PhasedExecutorService;
 import com.martinandersson.javaee.utils.Deployments;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.UncheckedIOException;
+import static com.martinandersson.javaee.utils.HttpRequests.getObject;
+import com.martinandersson.javaee.utils.PhasedExecutorService;
 import java.net.URL;
-import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.OptionalInt;
@@ -105,7 +102,7 @@ public class RequestScopedTest
     @RunAsClient
     @InSequence(1)
     public void resuseOfRequestScoped(@ArquillianResource URL url) {
-        final TestDriver1.Report report = makeRequest(url, TestDriver1.class);
+        final TestDriver1.Report report = getObject(url, TestDriver1.class);
         assertTestReport(report);
         firstRequestScopedBeanId = OptionalInt.of(report.servletInjectedRequestScopedId);
     }
@@ -120,10 +117,10 @@ public class RequestScopedTest
     @InSequence(2)
     public void newRequestNewRequestScoped(@ArquillianResource URL url) {
         
-        final int firstRequestScopedBeanId = this.firstRequestScopedBeanId
+        final int firstRequestScopedBeanId = this.firstRequestScopedBeanId // <-- in this context (hiding a field), I really do feel that this.staticField instead of Type.staticField increase readability
                 .orElseThrow(AssertionError::new);
         
-        final TestDriver1.Report report = makeRequest(url, TestDriver1.class);
+        final TestDriver1.Report report = getObject(url, TestDriver1.class);
         assertTestReport(report);
         
         // The real deal:
@@ -162,7 +159,7 @@ public class RequestScopedTest
     @RunAsClient
     @InSequence(3)
     public void contextDoesNotPropagateAcrossAsynchronousEJB(@ArquillianResource URL url) {
-        final TestDriver2.Report report = makeRequest(url, TestDriver2.class);
+        final TestDriver2.Report report = getObject(url, TestDriver2.class);
         
         assertNotEquals("Expected that an asynchronous EJB call equals a new @RequestScoped bean.",
                 report.servletInjectedRequestScopedId, report.statelessOwnedRequestScopedId);
@@ -188,7 +185,7 @@ public class RequestScopedTest
         // Amount of HTTP requests:
         final int M = N * 100;
         
-        Callable<TestDriver1.Report> task = () -> makeRequest(url, TestDriver1.class);
+        Callable<TestDriver1.Report> task = () -> getObject(url, TestDriver1.class);
         
         List<Callable<TestDriver1.Report>> tasks = new ArrayList<>(M);
         
@@ -229,37 +226,6 @@ public class RequestScopedTest
      * | INTERNAL API |
      *  --------------
      */
-    
-    /**
-     * Will make a HTTP GET-request to the provided test driver.
-     * 
-     * @param url deployed application URL, provided by Arquillian
-     * @param testDriverType the test driver class
-     * 
-     * @return the test report, as provided by {@code TestDriver}
-     */
-    private <T> T makeRequest(URL url, Class<?> testDriverType)
-    {
-        final URL testDriver;
-        final URLConnection conn;
-        
-        try {
-            testDriver = new URL(url, testDriverType.getSimpleName());
-            conn = testDriver.openConnection();
-        }
-        catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
-        
-        conn.setRequestProperty("Connection", "close");
-        
-        try (ObjectInputStream in = new ObjectInputStream(conn.getInputStream());) {
-            return (T) in.readObject();
-        }
-        catch (IOException | ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-    }
     
     /**
      * Will assert that all @RequestScoped bean Id:s are the same, independently
