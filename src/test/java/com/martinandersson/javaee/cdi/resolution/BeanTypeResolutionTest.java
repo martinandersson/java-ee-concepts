@@ -43,7 +43,7 @@ public class BeanTypeResolutionTest {
     }
     
     /**
-     * WIll make a HTTP POST request to {@code TypeResolutionDriver}-servlet
+     * Will make a HTTP POST request to {@code TypeResolutionDriver}-servlet
      * which use a calculator that do not implement an interface. The calculator
      * is a POJO as much as a POJO can be.
      * 
@@ -64,8 +64,8 @@ public class BeanTypeResolutionTest {
         
         final long sum;
         
-        try (PrintWriter out = new PrintWriter(new OutputStreamWriter(conn.getOutputStream(), StandardCharsets.UTF_8), false)) {
-            
+        try (PrintWriter out = new PrintWriter(new OutputStreamWriter(conn.getOutputStream(), StandardCharsets.UTF_8), false))
+        {
             // Try sum 5 + 5
             out.println(5);
             out.println(5);
@@ -75,16 +75,5 @@ public class BeanTypeResolutionTest {
         }
         
         assertEquals("Expected that 5 + 5 equals 10", 10, sum);
-    }
-}
-
-/**
- * The {@code SimpleCalculator} does not implement an interface.
- * 
- * @author Martin Andersson (webmaster at martinandersson.com)
- */
-class SimpleCalculator {
-    public long sum(long... values) {
-        return LongStream.of(values).sum();
     }
 }

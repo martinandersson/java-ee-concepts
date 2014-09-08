@@ -19,7 +19,10 @@ public class BeanTypeResolutionDriver extends HttpServlet
     
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        // Convert all lines in POST body to longs:
         long[] values = req.getReader().lines().mapToLong(Long::parseLong).toArray();
+        
+        // Sum and return (using the response header):
         long sum = simpleCalculator.sum(values);
         resp.setHeader("sum", String.valueOf(sum));
     }
