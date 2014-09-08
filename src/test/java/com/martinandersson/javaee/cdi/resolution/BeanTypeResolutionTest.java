@@ -24,11 +24,10 @@ import org.junit.runner.RunWith;
  * In fact, type is the number one "bean qualifier" that makes type safe
  * resolution possible.<p>
  * 
- * Note that in this deployment, there exists only one {@code SimpleCalculator}
- * which is {@code final}. Had there also existed a subclass thereof, then the
- * injection point in {@code BeanTypeResolutionDriver} will represent an
- * ambiguous dependency: two bean targets match. Such deployment will almost
- * always fail.
+ * Note that in this deployment, there exists only one {@code SimpleCalculator}.
+ * Had there also existed a subclass thereof, then the injection point in
+ * {@code BeanTypeResolutionDriver} will represent an ambiguous dependency: two
+ * bean targets match. Such deployment will almost always fail.
  * 
  * @author Martin Andersson (webmaster at martinandersson.com)
  */
