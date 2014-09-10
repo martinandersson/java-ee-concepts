@@ -17,7 +17,7 @@ public class ConcurrentInvocationCounter
                                    logicalInstances = new LongAdder(),
                                    concurrentCalls = new LongAdder();
     
-    private static final AtomicBoolean isSleeping = new AtomicBoolean();
+    private final AtomicBoolean isSleeping = new AtomicBoolean();
     
     
     
