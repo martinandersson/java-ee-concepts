@@ -20,7 +20,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
- * There are many 
+ * TODO: Write something.
  * 
  * @author Martin Andersson (webmaster at martinandersson.com)
  */
@@ -42,7 +42,7 @@ public class QualifierTest {
                 // Common bean type
                 Caloric.class,
                 
-                // Carolic implementations
+                // Caloric implementations
                 Water.class,
                 Broccoli.class,
                 Meat.class);
@@ -58,7 +58,6 @@ public class QualifierTest {
         
         assertEquals("Expected that Broccoli is the only @Healthy Caloric bean.",
                 Broccoli.class, report.healthyType);
-        
         
         assertEquals("Expected that Meat is the only @Unhealthy Caloric bean.",
                 Meat.class, report.unhealthyType);

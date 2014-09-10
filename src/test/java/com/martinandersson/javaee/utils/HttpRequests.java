@@ -51,6 +51,8 @@ public final class HttpRequests
             return (T) in.readObject();
         }
         catch (IOException | ClassNotFoundException e) {
+            // Might be that you haven't packaged all dependent class files with the @Deployment?
+            // Servlet or endpoint your trying to call isn't properly implemented?
             throw new RuntimeException(e);
         }
     }
