@@ -33,7 +33,7 @@ import javax.servlet.http.HttpServletResponse;
 public class QualifierDriver extends HttpServlet
 {
     @Inject
-    // Is implicitly also annotated: @javax.enterprise.inject.Default
+    // This injection point is implicitly also annotated: @javax.enterprise.inject.Default
     Caloric water;
     
     @Inject @Healthy

@@ -182,6 +182,7 @@
  * specification (JSR-342) has been put:
  * <pre>{@code
  *     https://jcp.org/aboutJava/communityprocess/final/jsr342/index.html
+ * 
  * }</pre>
  * 
  * The Java EE 7 specification (that is, JSR-342, which sometimes is called
@@ -190,6 +191,7 @@
  * page of the Java EE 6 specification to actually find it:
  * <pre>{@code
  *     https://jcp.org/aboutJava/communityprocess/final/jsr316/index.html
+ * 
  * }</pre>
  * 
  * 

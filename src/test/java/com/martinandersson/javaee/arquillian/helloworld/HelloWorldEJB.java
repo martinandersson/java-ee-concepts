@@ -12,8 +12,8 @@ import javax.ejb.TransactionAttributeType;
  * 
  * This EJB has no reason being an EJB which is an "expensive" component to use.
  * Instead, it would be better suited as a @Dependent CDI bean: meaning no
- * annotations at all (note 1). However, we're using a heavy-duty EJB here only
- * as proof of concept.
+ * annotations at all (note 1), or as a utility class with static methods only.
+ * However, we're using a heavy-duty EJB here only as proof of concept.
  * 
  * @author Martin Andersson (webmaster at martinandersson.com)
  */
