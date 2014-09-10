@@ -1,4 +1,4 @@
-package com.martinandersson.javaee.cdi.qualifiers.caloric;
+package com.martinandersson.javaee.cdi.qualifiers.lib;
 
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.METHOD;

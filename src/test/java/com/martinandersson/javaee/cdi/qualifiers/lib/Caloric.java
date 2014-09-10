@@ -1,4 +1,4 @@
-package com.martinandersson.javaee.cdi.qualifiers.caloric;
+package com.martinandersson.javaee.cdi.qualifiers.lib;
 
 /**
  * A {@code Caloric} class is a unit of container for any number of calories,

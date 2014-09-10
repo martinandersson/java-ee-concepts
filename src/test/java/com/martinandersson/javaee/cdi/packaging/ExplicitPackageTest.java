@@ -1,8 +1,8 @@
 package com.martinandersson.javaee.cdi.packaging;
 
-import com.martinandersson.javaee.cdi.packaging.calculators.CalculatorRequestScoped;
-import com.martinandersson.javaee.cdi.packaging.calculators.CalculatorUnAnnotated;
-import com.martinandersson.javaee.cdi.packaging.calculators.CalculatorManagedBean;
+import com.martinandersson.javaee.cdi.packaging.lib.CalculatorRequestScoped;
+import com.martinandersson.javaee.cdi.packaging.lib.CalculatorUnAnnotated;
+import com.martinandersson.javaee.cdi.packaging.lib.CalculatorManagedBean;
 import com.martinandersson.javaee.utils.Deployments;
 import javax.inject.Inject;
 import org.jboss.arquillian.container.test.api.Deployment;

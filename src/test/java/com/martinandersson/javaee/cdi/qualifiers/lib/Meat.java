@@ -1,4 +1,4 @@
-package com.martinandersson.javaee.cdi.qualifiers.caloric;
+package com.martinandersson.javaee.cdi.qualifiers.lib;
 
 /**
  * Meat is murder. Or producer of life in large farms. Depends on how you look

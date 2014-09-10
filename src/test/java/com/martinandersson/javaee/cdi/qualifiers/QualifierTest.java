@@ -1,11 +1,11 @@
 package com.martinandersson.javaee.cdi.qualifiers;
 
-import com.martinandersson.javaee.cdi.qualifiers.caloric.Healthy;
-import com.martinandersson.javaee.cdi.qualifiers.caloric.Caloric;
-import com.martinandersson.javaee.cdi.qualifiers.caloric.Broccoli;
-import com.martinandersson.javaee.cdi.qualifiers.caloric.Unhealthy;
-import com.martinandersson.javaee.cdi.qualifiers.caloric.Meat;
-import com.martinandersson.javaee.cdi.qualifiers.caloric.Water;
+import com.martinandersson.javaee.cdi.qualifiers.lib.Healthy;
+import com.martinandersson.javaee.cdi.qualifiers.lib.Caloric;
+import com.martinandersson.javaee.cdi.qualifiers.lib.Broccoli;
+import com.martinandersson.javaee.cdi.qualifiers.lib.Unhealthy;
+import com.martinandersson.javaee.cdi.qualifiers.lib.Meat;
+import com.martinandersson.javaee.cdi.qualifiers.lib.Water;
 import com.martinandersson.javaee.cdi.qualifiers.QualifierDriver.Report;
 import com.martinandersson.javaee.utils.Deployments;
 import com.martinandersson.javaee.utils.HttpRequests;

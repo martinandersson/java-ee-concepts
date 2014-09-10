@@ -1,4 +1,4 @@
-package com.martinandersson.javaee.cdi.packaging.calculators;
+package com.martinandersson.javaee.cdi.packaging.lib;
 
 import java.util.stream.IntStream;
 import javax.enterprise.context.RequestScoped;

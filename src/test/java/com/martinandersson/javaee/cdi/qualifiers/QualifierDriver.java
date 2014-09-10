@@ -1,8 +1,8 @@
 package com.martinandersson.javaee.cdi.qualifiers;
 
-import com.martinandersson.javaee.cdi.qualifiers.caloric.Healthy;
-import com.martinandersson.javaee.cdi.qualifiers.caloric.Caloric;
-import com.martinandersson.javaee.cdi.qualifiers.caloric.Unhealthy;
+import com.martinandersson.javaee.cdi.qualifiers.lib.Healthy;
+import com.martinandersson.javaee.cdi.qualifiers.lib.Caloric;
+import com.martinandersson.javaee.cdi.qualifiers.lib.Unhealthy;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;

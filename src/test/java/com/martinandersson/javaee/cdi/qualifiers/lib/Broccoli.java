@@ -1,4 +1,4 @@
-package com.martinandersson.javaee.cdi.qualifiers.caloric;
+package com.martinandersson.javaee.cdi.qualifiers.lib;
 
 /**
  * Broccoli is healthy for you!<p>

@@ -1,4 +1,4 @@
-package com.martinandersson.javaee.cdi.qualifiers.caloric;
+package com.martinandersson.javaee.cdi.qualifiers.lib;
 
 /**
  * This bean has no explicitly put qualifiers, therefore, the water bean will
