@@ -58,10 +58,12 @@ import org.junit.runner.RunWith;
  * }</pre>
  * 
  * <strong>However</strong>, WELD do call the observer methods of our replaced
- * bean, both static and non-static. So currently, all tests in this class that
- * test this behavior fail in both GlassFish and WildFly.
+ * bean, both static and non-static. So currently, the test
+ * "stupidCalculatorObserversNotCalled" in this class fail in both GlassFish and
+ * WildFly.
  * 
- * Bug filed <a href="">here (todo..)<a/>.
+ * Bug filed <a href="https://issues.jboss.org/browse/WELD-1741">here<a/>.
+ * 
  * 
  * 
  * @author Martin Andersson (webmaster at martinandersson.com)
