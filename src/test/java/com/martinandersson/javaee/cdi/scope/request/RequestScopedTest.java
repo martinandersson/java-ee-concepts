@@ -76,6 +76,11 @@ public class RequestScopedTest
     
     
     
+    @ArquillianResource
+    URL url;
+    
+    
+    
     /**
      * We expect that..
      * 
@@ -101,7 +106,7 @@ public class RequestScopedTest
     @Test
     @RunAsClient
     @InSequence(1)
-    public void resuseOfRequestScoped(@ArquillianResource URL url) {
+    public void resuseOfRequestScoped() {
         final TestDriver1.Report report = getObject(url, TestDriver1.class);
         assertTestReport(report);
         firstRequestScopedBeanId = OptionalInt.of(report.servletInjectedRequestScopedId);
@@ -115,7 +120,7 @@ public class RequestScopedTest
     @Test
     @RunAsClient
     @InSequence(2)
-    public void newRequestNewRequestScoped(@ArquillianResource URL url) {
+    public void newRequestNewRequestScoped() {
         
         final int firstRequestScopedBeanId = this.firstRequestScopedBeanId // <-- in this context (hiding a field), I really do feel that this.staticField instead of Type.staticField increase readability
                 .orElseThrow(AssertionError::new);
@@ -158,7 +163,7 @@ public class RequestScopedTest
     @Test
     @RunAsClient
     @InSequence(3)
-    public void contextDoesNotPropagateAcrossAsynchronousEJB(@ArquillianResource URL url) {
+    public void contextDoesNotPropagateAcrossAsynchronousEJB() {
         final TestDriver2.Report report = getObject(url, TestDriver2.class);
         
         assertNotEquals("Expected that an asynchronous EJB call equals a new @RequestScoped bean.",
@@ -177,7 +182,7 @@ public class RequestScopedTest
     @Test
     @RunAsClient
     @InSequence(4)
-    public void clientProxyConcurrency(@ArquillianResource URL url) {
+    public void clientProxyConcurrency() {
         
         // Amount of threads to use (I deliberately want contention):
         final int N = Runtime.getRuntime().availableProcessors() * 20;
