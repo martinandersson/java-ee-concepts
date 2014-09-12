@@ -12,8 +12,14 @@
  *   <li>{@linkplain com.martinandersson.javaee.cdi.packaging}</li>
  *   <li>{@linkplain com.martinandersson.javaee.cdi.scope}</li>
  *   <li>{@linkplain com.martinandersson.javaee.cdi.resolution}</li>
- *   <li>TODO: More..</li>
- * </ol>
+ *   <li>{@linkplain com.martinandersson.javaee.cdi.qualifiers}</li>
+ *   <li>{@linkplain com.martinandersson.javaee.cdi.alternatives}</li>
+ *   <li>{@linkplain com.martinandersson.javaee.cdi.specializes}</li>
+ *   <li><i>TODO:</i></li>
+ *   <li>{@linkplain com.martinandersson.javaee.cdi.interceptors}</li>
+ *   <li>{@linkplain com.martinandersson.javaee.cdi.decorators}</li>
+ *   <li>{@linkplain com.martinandersson.javaee.cdi.events}</li>
+ * </ol><p>
  * 
  * 
  * 
