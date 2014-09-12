@@ -100,8 +100,6 @@ public class RequestScopedTest
      * 
      * Please review the package description of
      * {@code com.martinandersson.javaee.cdi.scope}, section "Client proxies".
-     * 
-     * @param url deployed application URL, provided by Arquillian
      */
     @Test
     @RunAsClient
@@ -114,8 +112,6 @@ public class RequestScopedTest
     
     /**
      * For each new HTTP request, a new @RequestScoped bean will be used.
-     * 
-     * @param url deployed application URL, provided by Arquillian
      */
     @Test
     @RunAsClient
@@ -157,8 +153,6 @@ public class RequestScopedTest
      * }</pre>
      * 
      * Also see {@code ./com/martinandersson/javaee/cdi/scope/package-info.java}.
-     * 
-     * @param url deployed application URL, provided by Arquillian
      */
     @Test
     @RunAsClient
@@ -176,8 +170,6 @@ public class RequestScopedTest
      * instances.<p>
      * 
      * This is effectively a redo of the last test, only executed concurrently.
-     * 
-     * @param url deployed application URL, provided by Arquillian
      */
     @Test
     @RunAsClient

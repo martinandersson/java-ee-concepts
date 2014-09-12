@@ -62,7 +62,7 @@ import org.junit.runner.RunWith;
  * "stupidCalculatorObserversNotCalled" in this class fail in both GlassFish and
  * WildFly.
  * 
- * Bug filed <a href="https://issues.jboss.org/browse/WELD-1741">here<a/>.
+ * Bug filed <a href="https://issues.jboss.org/browse/WELD-1741">here</a>.
  * 
  * 
  * 
