@@ -155,17 +155,17 @@ public class PhasedExecutorService implements ExecutorService
 
     @Override
     public boolean isShutdown() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
     public boolean isTerminated() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
     public boolean awaitTermination(long timeout, TimeUnit unit) throws InterruptedException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     /**
@@ -188,7 +188,7 @@ public class PhasedExecutorService implements ExecutorService
      */
     @Override
     public <T> List<Future<T>> invokeAll(Collection<? extends Callable<T>> tasks) {
-        return invokeAll(tasks, (ignored1, ignored2) -> false);
+        return invokeAll(tasks, ignored -> false);
     }
     
     /**
@@ -227,7 +227,7 @@ public class PhasedExecutorService implements ExecutorService
         
         phaser = new Phaser(threadCount) {
             @Override protected boolean onAdvance(int phase, int registeredParties) {
-                return beforeEachPhase.onAdvance(phase, registeredParties); }
+                return beforeEachPhase.onAdvance(phase); }
         };
         
         CyclicBarrier finished = new CyclicBarrier(threadCount + 1, () -> {
@@ -405,12 +405,10 @@ public class PhasedExecutorService implements ExecutorService
          * Callback invoked before each new phase or pulse is executed.
          * 
          * @param phase the next phase, starts at {@code 0}
-         * @param parties amount of threads waiting to execute a task, will
-         *        always be the thread count
          * 
          * @return {@code true} if the executor service should abort the phase
          *         and terminate, otherwise {@code false}
          */
-        boolean onAdvance(int phase, int parties);
+        boolean onAdvance(int phase);
     }
 }
