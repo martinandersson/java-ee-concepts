@@ -3,9 +3,7 @@ package com.martinandersson.javaee.cdi.scope.applicationscoped;
 import com.martinandersson.javaee.utils.Deployments;
 import com.martinandersson.javaee.utils.PhasedExecutorService;
 import java.util.concurrent.Callable;
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.collectingAndThen;
-import java.util.stream.IntStream;
+import java.util.concurrent.Executors;
 import javax.inject.Inject;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
@@ -47,13 +45,10 @@ public class ApplicationScopedConcurrencyTest {
          * Anyways, whatever works:
          */
         PhasedExecutorService executor = new PhasedExecutorService();
-        
         final int threadCount = executor.getThreadCount();
         
-        Callable<Void> task = () -> { bean.sleepOneSecond(); return null; };
-        
-        IntStream.range(0, threadCount).mapToObj(x -> task)
-                .collect(collectingAndThen(toList(), executor::invokeAll));
+        Callable<?> task = Executors.callable(bean::sleepOneSecond);
+        executor.invokeManyTimes(task, threadCount);
         
         assertEquals("Expected all but one thread to arrive concurrently.",
                 threadCount - 1, ConcurrentInvocationCounter.getConcurrentCallsCount());

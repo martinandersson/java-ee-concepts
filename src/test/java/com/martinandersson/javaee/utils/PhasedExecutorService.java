@@ -167,6 +167,25 @@ public class PhasedExecutorService implements ExecutorService
     public boolean awaitTermination(long timeout, TimeUnit unit) throws InterruptedException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
+    
+    /**
+     * Is equivalent to {@linkplain #invokeAll(Collection)
+     * invokeAll(java.util.Collection)}, only that this method accept one single
+     * task that will be copied into a list of equal size to the provided
+     * {@code count}.<p>
+     * 
+     * The task must be thread-safe given that it will be executed concurrently.
+     * 
+     * @param <T> type of result
+     * @param task the logic to execute concurrently..
+     * @param count ..for this many times
+     * 
+     * @return all futures for management of task and retrieval of result
+     */
+    public <T> List<Future<T>> invokeManyTimes(Callable<T> task, int count) {
+        List<Callable<T>> copies = Collections.nCopies(count, task);
+        return invokeAll(copies);
+    }
 
     /**
      * {@inheritDoc}<p>
