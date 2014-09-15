@@ -1,10 +1,14 @@
 package com.martinandersson.javaee.utils;
 
+import static com.martinandersson.javaee.utils.HttpRequests.RequestParameter.buildQuery;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.UncheckedIOException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Procedures for making {@code HTTP/1.1} request to the test server.<p>
@@ -24,21 +28,29 @@ public final class HttpRequests
     
     /**
      * Will make a GET-request to the provided Servlet test driver and return an
-     * expected Java object as response.
+     * expected Java object as response.<p>
+     * 
+     * Do note that the underlying Java entity used to make the GET-request is
+     * {@code HttpURLConnection} which most likely uses pooled connections.
+     * Therefore, invoking this method in a concurrent test has limited effects.
+     * Consider using a Socket instead (which we will add in this class in the
+     * future, or change the implementation of this method).
      * 
      * @param <T> type of returned object
      * @param url deployed application URL ("application context root"),
      *            provided by Arquillian
      * @param testDriverType the test driver class
+     * @param headers each header entry will be added to the GET-request
      * 
      * @return object returned by the test driver
      */
-    public static <T> T getObject(URL url, Class<?> testDriverType) {
+    public static <T> T getObject(URL url, Class<?> testDriverType, RequestParameter... headers) {
         final URL testDriver;
         final URLConnection conn;
+        final String query = buildQuery(headers);
         
         try {
-            testDriver = new URL(url, testDriverType.getSimpleName());
+            testDriver = new URL(url, testDriverType.getSimpleName() + query);
             conn = testDriver.openConnection();
         }
         catch (IOException e) {
@@ -54,6 +66,35 @@ public final class HttpRequests
             // Might be that you haven't packaged all dependent class files with the @Deployment?
             // Servlet or endpoint your trying to call isn't properly implemented?
             throw new RuntimeException(e);
+        }
+    }
+    
+    
+    
+    public static class RequestParameter
+    {
+        static String buildQuery(RequestParameter... requestParameters) {
+            return Stream.of(requestParameters)
+                    .map(RequestParameter::asKeyValue)
+                    .collect(Collectors.joining("&", "?", ""));
+        }
+        
+        private final String key;
+        private final String value;
+        
+        public RequestParameter(String key, String value) {
+            if (key.matches("\\s+"))
+                throw new IllegalArgumentException("Whitespace found in key \"" + key + "\". Please percent-encode the key.");
+            
+            if (value.matches("\\s+"))
+                throw new IllegalArgumentException("Whitespace found in value: \"" + value + "\". Please percent-encode the value.");
+            
+            this.key = key;
+            this.value = Objects.requireNonNull(value, "value is null");
+        }
+        
+        public final String asKeyValue() {
+            return key + "=" + value;
         }
     }
 }
