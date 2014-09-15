@@ -3,6 +3,7 @@ package com.martinandersson.javaee.cdi.scope.request;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.util.concurrent.TimeUnit;
 import javax.ejb.EJB;
 import javax.inject.Inject;
 import javax.servlet.ServletException;
@@ -28,6 +29,16 @@ public class TestDriver1 extends HttpServlet {
     
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        
+        // Used by concurrent tests:
+        if ("true".equalsIgnoreCase(req.getParameter("sleep"))) {
+            try {
+                TimeUnit.SECONDS.sleep(1);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        
         Report report = new Report(
                 requestScopedBean.getId(),
                 requestScopedBean.getIdOfNestedRequestedScopedBean(),

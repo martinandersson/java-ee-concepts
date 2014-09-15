@@ -1,10 +1,10 @@
 package com.martinandersson.javaee.cdi.scope.request;
 
 import com.martinandersson.javaee.utils.Deployments;
+import com.martinandersson.javaee.utils.HttpRequests.RequestParameter;
 import static com.martinandersson.javaee.utils.HttpRequests.getObject;
 import com.martinandersson.javaee.utils.PhasedExecutorService;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.OptionalInt;
 import java.util.Set;
@@ -24,32 +24,14 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
- * <h2>Results using WildFly 8.1.0</h2>
+ * Tests in this class:
  * 
- * Work flawlessly. Sometimes though, first run might crash, complaining about
- * deployment failure, or the deployment/test just hangs indefinitely.
- * Restarting the test solve the problem.<p>
- * 
- * The time if takes for WildFly on my machine is about 28 seconds.
- * 
- * 
- * 
- * <h2>Results using GlassFish 4.0.1-b08-m1</h2>
- * 
- * Works for most of the time, but sometimes - in particular so when redoing the
- * test a consecutive second time - fail throwing a {@code
- * java.net.SocketException} with the message:
- * <pre>{@code
- *     No buffer space available (maximum connections reached?): connect
- * }</pre>
- * 
- * It seem to be that GlassFish doesn't close the sockets fast enough. One fix,
- * not currently applied, is to make each request sleep for 10 milliseconds
- * before making the next request.
- * 
- * The time if takes for GlassFish on my machine is about 20 seconds.
- * 
- * 
+ * <ol>
+ *   <li>{@linkplain #resuseOfRequestScoped() resuseOfRequestScoped()}</li>
+ *   <li>{@linkplain #newRequestNewRequestScoped() newRequestNewRequestScoped()}</li>
+ *   <li>{@linkplain #contextDoesNotPropagateAcrossAsynchronousEJB() contextDoesNotPropagateAcrossAsynchronousEJB()}</li>
+ *   <li>{@linkplain #clientProxyConcurrency() clientProxyConcurrency()}</li>
+ * </ol>
  * 
  * @author Martin Andersson (webmaster at martinandersson.com)
  */
@@ -176,29 +158,18 @@ public class RequestScopedTest
     @InSequence(4)
     public void clientProxyConcurrency() {
         
-        // Amount of threads to use (I deliberately want contention):
-        final int N = Runtime.getRuntime().availableProcessors() * 20;
+        final PhasedExecutorService executor = new PhasedExecutorService();
         
-        // Amount of HTTP requests:
-        final int M = N * 100;
+        final RequestParameter sleep = new RequestParameter("sleep", "true");
+        Callable<TestDriver1.Report> task = () -> getObject(url, TestDriver1.class, sleep);
         
-        Callable<TestDriver1.Report> task = () -> getObject(url, TestDriver1.class);
-        
-        List<Callable<TestDriver1.Report>> tasks = new ArrayList<>(M);
-        
-        for (int m = M; m > 0; --m)
-            tasks.add(task);
-        
-        PhasedExecutorService executor = new PhasedExecutorService(N);
-        
-        List<TestDriver1.Report> reports = executor.invokeAll(tasks).stream()
+        List<TestDriver1.Report> reports = executor.invokeManyTimes(task, executor.getThreadCount()).stream()
                 .map(future -> {
                     try {
-                        return future.get();
-                    } catch (InterruptedException | ExecutionException e) {
-                        throw new RuntimeException(e);
-                    }
-                }).collect(Collectors.toList());
+                        return future.get(); }
+                    catch (InterruptedException | ExecutionException e) {
+                        throw new RuntimeException(e); }})
+                .collect(Collectors.toList());
         
         // Assert each report
         reports.stream().forEach(this::assertTestReport);
@@ -208,12 +179,7 @@ public class RequestScopedTest
                 .map(report -> report.servletInjectedRequestScopedId)
                 .collect(Collectors.toSet());
         
-        /*
-         * If this test fails, it doesn't have to be wrong with the server. In
-         * theory, it will fail from time to time. See JavaDoc of
-         * RequestScopedBean.getId().
-         */
-        assertEquals("All @RequestScoped beans must be unique.", M, uniqueIds.size());
+        assertEquals("All @RequestScoped beans must be unique.", executor.getThreadCount(), uniqueIds.size());
     }
     
     
