@@ -5,7 +5,6 @@ import javax.inject.Inject;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -14,8 +13,8 @@ import org.junit.runner.RunWith;
  * <pre>{@code
  * 
  *     A persistent field or property of an entity or embeddable class may
- *     correspond to a collection of a basic type or embeddable class (“element
- *     collection”). Such a collection, when specified as such by the
+ *     correspond to a collection of a basic type or embeddable class ("element
+ *     collection"). Such a collection, when specified as such by the
  *     ElementCollection annotation, is mapped by means of a collection table,
  *     as defined in Section 11.1.8. If the ElementCollection annotation (or XML
  *     equivalent) is not specified for the collection-valued field or property,
@@ -41,8 +40,14 @@ import org.junit.runner.RunWith;
  * 
  * In order to make this test work for WildFly, you must not deploy {@code
  * Person1.class} and therefore you cannot execute test
- * {@code elementCollectionOptional()}.
+ * {@code elementCollectionOptional()}.<p>
  * 
+ * Bug filed here:
+ * <pre>{@code
+ * 
+ *     https://hibernate.atlassian.net/browse/HHH-9402
+ * 
+ * }</pre>
  * 
  * @author Martin Andersson (webmaster at martinandersson.com)
  */
