@@ -1,6 +1,7 @@
 package com.martinandersson.javaee.arquillian.persistence;
 
 import com.martinandersson.javaee.resources.ArquillianDS;
+import com.martinandersson.javaee.utils.Deployments;
 import java.util.List;
 import java.util.logging.Logger;
 import javax.inject.Inject;
@@ -71,14 +72,18 @@ import org.junit.runner.RunWith;
  * request to the plugin developers that they add a menu refresh item). Once you
  * see the database, right-click on it and select "connect". A new connection
  * leaf should pop-up a bit further down on the screen. Something like:
- * 
  * <pre>{@code
- *     "jdbc:derby://localhost:1527/arquillian-test-db [app on Default schema]"
+ * 
+ *     "jdbc:derby://localhost:1527/arquillian-test-db [ on Default schema]"
+ * 
  * }</pre>
  * 
- * Expand the connection leaf and continue expanding "Other schemas" -> "APP" ->
- * "Tables". Right-click table "PERSON" and select "View Data...". You should
- * see Donald somewhere in that table.<p>
+ * Expand the connection leaf and continue expanding "Other schemas" ->
+ * "ARQUILLIAN_PERSISTENCE" -> "Tables". Right-click table "PERSON" and select
+ * "View Data...". You should see Donald somewhere in that table.<p>
+ * 
+ * The schema "ARQUILLIAN_PERSISTENCE" has been specified using the
+ * {@code @Table} annotation on the JPA entity class {@linkplain Person}.<p>
  * 
  * 
  * 
@@ -234,51 +239,12 @@ public class PersistenceTest
     private static final Logger LOGGER = Logger.getLogger(PersistenceTest.class.getName());
     
     @Deployment
-    private static WebArchive buildDeployment()
-    {
-        WebArchive war = ShrinkWrap.create(WebArchive.class, PersistenceTest.class.getSimpleName() + ".war");
-        war.addClasses(ArquillianDS.class, PersonRepository.class, Person.class, Address.class);
-        
-        /*
-         * Previously, we added "ArquillianDS.class" as a convenient way to
-         * add our data source definition. Alternatively, we could have included
-         * the deployment descriptor instead:
-         * 
-         *     war.addAsWebInfResource("web.xml");
-         * 
-         * A server specific configuration file can be added like so (note 3):
-         * 
-         *     war.addAsResource("wildfly-ds.xml", "META-INF/wildfly-ds.xml");
-         */
-        
-        
-        // Include the Java DB client driver (for WildFly)
-        JavaArchive derbyDriver = Maven.resolver().resolve(
-                "org.apache.derby:derbyclient:10.10.2.0")
-                .withTransitivity().asSingle(JavaArchive.class);
-        
-        war.addAsLibrary(derbyDriver);
-        
-        /*
-         * In the future, you might also want to add more libraries such as
-         * "org.mockito:mockito-all:1.9.5" (server-side mocking! (note 4)). That
-         * would change the previous code snippet to:
-         * 
-         *     JavaArchive[] libs = Maven.resolver().resolve(
-         *             "org.apache.derby:derbyclient:10.10.2.0",
-         *             "org.mockito:mockito-all:1.9.5")
-         *             .withTransitivity().as(JavaArchive.class);
-         * 
-         *     war.addAsLibraries(libs);
-         * 
-         * Read more: https://github.com/shrinkwrap/resolver
-         */
-        
-        
-        war.addAsResource("persistence.xml", "META-INF/persistence.xml");
-        
-        LOGGER.info(() -> war.toString(true).replace("\n", "\n\t"));
-        return war;
+    private static WebArchive buildDeployment() {
+        return Deployments.buildPersistenceArchive(
+                PersistenceTest.class,
+                PersonRepository.class,
+                Person.class,
+                Address.class);
     }
     
     @Inject
@@ -350,14 +316,4 @@ public class PersistenceTest
  *         resource. But in such case, modern optimizations employed by
  *         application servers can vastly reduce the cost (google "Logging Last
  *         Resource" (LLR) or "Last Agent Optimization" (LAO)).
- * 
- * Note 3: Actually we would like to use the methods "addAsWebResource" and
- *         "addAsManifestResource" but they don't work properly, so the example
- *         provided go down a level and explicitly provide the path.
- * 
- * Note 4: In  HelloWorldTest.java, I argued that mocking should not be used in
- *         Arquillian. But mocking doesn't necessarily require the trade of a
- *         working implementation for a mock. One can also use mocking to try
- *         new and unwritten implementations of system components together with
- *         the rest of the application without having to write them first.
  */

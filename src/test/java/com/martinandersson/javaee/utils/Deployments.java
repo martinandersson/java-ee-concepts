@@ -1,5 +1,6 @@
 package com.martinandersson.javaee.utils;
 
+import com.martinandersson.javaee.resources.ArquillianDS;
 import com.martinandersson.javaee.resources.CDIInspector;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -8,6 +9,7 @@ import java.io.OutputStreamWriter;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.util.Arrays;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -20,6 +22,7 @@ import org.jboss.shrinkwrap.api.container.LibraryContainer;
 import org.jboss.shrinkwrap.api.container.ManifestContainer;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
+import org.jboss.shrinkwrap.resolver.api.maven.Maven;
 
 /**
  * API for building and manipulating deployments.<p>
@@ -32,6 +35,32 @@ import org.jboss.shrinkwrap.api.spec.WebArchive;
 public final class Deployments
 {
     private static final Logger LOGGER = Logger.getLogger(Deployments.class.getName());
+    
+    
+    /*
+     * Next initialization uses Maven resolver to download the Java DB client.
+     * WildFly doesn't have this driver so we need to package the driver
+     * together with the deployments to make them work with Java DB.
+     * 
+     * In the future, you might also want to add more libraries such as
+     * "org.mockito:mockito-all:1.9.5" (server-side mocking! (note 1)). That
+     * would change the following code snippet to:
+     * 
+     *     JavaArchive[] libs = Maven.resolver().resolve(
+     *             "org.apache.derby:derbyclient:10.10.2.0",
+     *             "org.mockito:mockito-all:1.9.5")
+     *             .withTransitivity().as(JavaArchive.class);
+     * 
+     *     war.addAsLibraries(libs);
+     * 
+     * Read more: https://github.com/shrinkwrap/resolver
+     */
+    private static final JavaArchive DERBY_DRIVER = Maven.resolver()
+            .resolve("org.apache.derby:derbyclient:10.10.2.0")
+            .withTransitivity()
+            .asSingle(JavaArchive.class);
+    
+    
     
     private Deployments() {
         // Empty
@@ -59,6 +88,41 @@ public final class Deployments
     public static WebArchive buildCDIBeanArchive(Class<?> testClass, Class<?>... include) {
         WebArchive war = createWAR(testClass, include)
                 .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml");
+        
+        return log(war);
+    }
+    
+    /**
+     * Will build an archive that in addition to the provided classes, also
+     * include {@code ArquillianDS.class} (data source definition), the {@code
+     * persistence.xml} file (persistence unit configuration) and a Java DB
+     * client diver which WildFly doesn't have.
+     * 
+     * @param testClass calling test class
+     * @param include which classes to include, may be none
+     * 
+     * @return the archive
+     */
+    public static WebArchive buildPersistenceArchive(Class<?> testClass, Class<?>... include) {
+        // Append datasource definition to the include list:
+        include = Arrays.copyOf(include, include.length + 1);
+        include[include.length - 1] = ArquillianDS.class;
+        
+        /*
+         * Instead of using ArquillianDS.class as a convenient way to add our
+         * data source definition. We could have included a deployment
+         * descriptor instead:
+         * 
+         *     war.addAsWebInfResource("web.xml");
+         * 
+         * A server specific configuration file can be added like so (note 2):
+         * 
+         *     war.addAsResource("wildfly-ds.xml", "META-INF/wildfly-ds.xml");
+         */
+        
+        WebArchive war = createWAR(testClass, include)
+                .addAsLibrary(DERBY_DRIVER)
+                .addAsResource("persistence.xml", "META-INF/persistence.xml");
         
         return log(war);
     }
@@ -229,3 +293,20 @@ public final class Deployments
         return Stream.of(toString(archive).split("\n")).collect(Collectors.toSet());
     }
 }
+
+
+
+/*
+ * NOTES
+ * -----
+ * 
+ * 1) In the Arquillian "Hello World" test, I argued that mocking should not be
+ *    used in Arquillian. But mocking doesn't necessarily require the trade of a
+ *    working implementation for a mock. One can also use mocking to try new and
+ *    unwritten implementations of system components together with the rest of
+ *    the application without having to write them first.
+ * 
+ * 2) Actually I would like to use the methods "addAsWebResource()" and
+ *    "addAsManifestResource()" but they don't work properly, so the example
+ *    provided go down a level and explicitly provide the path.
+ */
