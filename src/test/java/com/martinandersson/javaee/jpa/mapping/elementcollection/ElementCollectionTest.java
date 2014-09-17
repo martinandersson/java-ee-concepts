@@ -63,11 +63,11 @@ public class ElementCollectionTest
     
     @Test
     public void elementCollectionOptional() {
-        persons.persist(new Person1("nick1", "nick2"));
+        persons.persist(new Person1("Person1_nick1", "Person1_nick2"));
     }
     
     @Test
     public void elementCollectionInSeparateTable() {
-        persons.persist(new Person2("nick1", "nick2"));
+        persons.persist(new Person2("Person2_nick1", "Person2_nick2"));
     }
 }
