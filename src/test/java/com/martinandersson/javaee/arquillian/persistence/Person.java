@@ -5,6 +5,7 @@ import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Table;
 import javax.persistence.Version;
 
 /**
@@ -20,6 +21,7 @@ import javax.persistence.Version;
  * @author Martin Andersson (webmaster at martinandersson.com)
  */
 @Entity
+@Table(schema = "ARQUILLIAN_PERSISTENCE")
 public class Person // note 1
 {
     @Id
