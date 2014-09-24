@@ -60,14 +60,16 @@ public class BeanTypeResolutionTest {
         conn.setDoOutput(true);
         conn.setRequestMethod("POST");
         conn.setRequestProperty("Content-Type", "UTF-8");
+        conn.setRequestProperty("Connection", "close");
         
         final long sum;
         
-        try (PrintWriter out = new PrintWriter(new OutputStreamWriter(conn.getOutputStream(), StandardCharsets.UTF_8), false))
+        try (OutputStreamWriter out = new OutputStreamWriter(conn.getOutputStream(), StandardCharsets.UTF_8))
         {
             // Try sum 5 + 5
-            out.println(5);
-            out.println(5);
+            out.write("5");
+            out.write("\r\n");
+            out.write("5");
             
             out.flush();
             sum = Long.parseLong(conn.getHeaderField("sum"));
