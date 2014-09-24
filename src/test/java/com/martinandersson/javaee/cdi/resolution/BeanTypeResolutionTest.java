@@ -3,7 +3,6 @@ package com.martinandersson.javaee.cdi.resolution;
 import com.martinandersson.javaee.utils.Deployments;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
