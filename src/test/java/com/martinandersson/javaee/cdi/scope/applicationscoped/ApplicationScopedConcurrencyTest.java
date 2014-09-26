@@ -2,8 +2,6 @@ package com.martinandersson.javaee.cdi.scope.applicationscoped;
 
 import com.martinandersson.javaee.utils.Deployments;
 import com.martinandersson.javaee.utils.PhasedExecutorService;
-import java.util.concurrent.Callable;
-import java.util.concurrent.Executors;
 import javax.annotation.Resource;
 import javax.enterprise.concurrent.ManagedThreadFactory;
 import javax.inject.Inject;
