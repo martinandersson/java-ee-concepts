@@ -1,8 +1,13 @@
 package com.martinandersson.javaee.utils;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
+import java.io.Serializable;
 import java.io.UncheckedIOException;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Objects;
@@ -71,6 +76,68 @@ public final class HttpRequests
             throw new AssertionError("Got object of unknown type.", e);
         }
     }
+    
+    /**
+     * Will make a POST-request to the provided Servlet test driver and return an
+     * expected Java object as response.<p>
+     * 
+     * The POST body will contained the provided {@code toSend} object in his
+     * binary form.<p>
+     * 
+     * This method is largely equivalent with {@linkplain
+     * #getObject(URL, Class, RequestParameter...)}.
+     * 
+     * @param <T> type of returned object
+     * @param url deployed application URL ("application context root"),
+     *            provided by Arquillian
+     * @param testDriverType the test driver class
+     * @param toSend serialized and put in body of the POST request
+     * 
+     * @return object returned by the test driver
+     */
+    public static <T> T sendGetObject(URL url, Class<?> testDriverType, Serializable toSend) {
+        Objects.requireNonNull(toSend);
+        
+        final URL testDriver; // = new URL(url, testDriverType.getSimpleName());
+        final HttpURLConnection conn;
+        
+        try {
+            testDriver = new URL(url, testDriverType.getSimpleName());
+            conn = (HttpURLConnection) testDriver.openConnection();
+            conn.setRequestMethod("POST");
+        }
+        catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+        catch (ClassCastException e) {
+            throw new IllegalArgumentException("Provided url is not a HTTP URI", e);
+        }
+        
+        conn.setDoOutput(true);
+        conn.setRequestProperty("Content-Type", "application/octet-stream");
+        conn.setRequestProperty("Connection", "close");
+        
+        try (OutputStream raw = conn.getOutputStream();
+             ObjectOutputStream writer = new ObjectOutputStream(raw);) {
+             
+             writer.writeObject(toSend);
+             
+             raw.write('\r'); raw.write('\n');
+             raw.write('\r'); raw.write('\n');
+        }
+        catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+        
+        try (InputStream raw = conn.getInputStream();
+             ObjectInputStream reader = new ObjectInputStream(raw);) {
+             return (T) reader.readObject();
+        }
+        catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+        catch (ClassNotFoundException e) {
+            throw new AssertionError("Got object of unknown type.", e);
         }
     }
     
