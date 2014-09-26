@@ -1,12 +1,12 @@
 package com.martinandersson.javaee.utils;
 
-import static com.martinandersson.javaee.utils.HttpRequests.RequestParameter.buildQuery;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.UncheckedIOException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Objects;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -47,7 +47,7 @@ public final class HttpRequests
     public static <T> T getObject(URL url, Class<?> testDriverType, RequestParameter... headers) {
         final URL testDriver;
         final URLConnection conn;
-        final String query = buildQuery(headers);
+        final String query = RequestParameter.buildQuery(headers);
         
         try {
             testDriver = new URL(url, testDriverType.getSimpleName() + query);
@@ -73,24 +73,26 @@ public final class HttpRequests
     
     public static class RequestParameter
     {
-        static String buildQuery(RequestParameter... requestParameters) {
+        private static String buildQuery(RequestParameter... requestParameters) {
             return Stream.of(requestParameters)
                     .map(RequestParameter::asKeyValue)
                     .collect(Collectors.joining("&", "?", ""));
         }
         
+        private static final Pattern WS_CHAR = Pattern.compile("\\s");
+        
         private final String key;
         private final String value;
         
         public RequestParameter(String key, String value) {
-            if (key.matches("\\s+"))
+            if (WS_CHAR.matcher(key).find())
                 throw new IllegalArgumentException("Whitespace found in key \"" + key + "\". Please percent-encode the key.");
             
-            if (value.matches("\\s+"))
+            if (WS_CHAR.matcher(value).find())
                 throw new IllegalArgumentException("Whitespace found in value: \"" + value + "\". Please percent-encode the value.");
             
             this.key = key;
-            this.value = Objects.requireNonNull(value, "value is null");
+            this.value = value;
         }
         
         public final String asKeyValue() {
