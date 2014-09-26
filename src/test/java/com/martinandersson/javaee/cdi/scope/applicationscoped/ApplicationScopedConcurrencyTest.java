@@ -4,6 +4,8 @@ import com.martinandersson.javaee.utils.Deployments;
 import com.martinandersson.javaee.utils.PhasedExecutorService;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Executors;
+import javax.annotation.Resource;
+import javax.enterprise.concurrent.ManagedThreadFactory;
 import javax.inject.Inject;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
@@ -17,7 +19,10 @@ import org.junit.runner.RunWith;
  * multithreading semantics of the CDI singleton.<p>
  * 
  * Results: For WildFly and GlassFish, the CDI singleton proxy do not serialize
- * concurrent calls.
+ * concurrent calls.<p>
+ * 
+ * <strong>Warning!</strong> GlassFish takes about a full minute on my machine
+ * to execute this test. WildFly 8.1.0 take 5 seconds =)
  * 
  * @author Martin Andersson (webmaster at martinandersson.com)
  */
@@ -34,21 +39,16 @@ public class ApplicationScopedConcurrencyTest {
     @Inject
     ConcurrentInvocationCounter bean;
     
+    @Resource
+    ManagedThreadFactory threadFactory;
+    
     @Test
     public void applicationScopedBeanIsUnsynchronized() {
         
-        /*
-         * Can't reliably get thread count of ManagedExecutorService and using
-         * ManagedThreadFactory with the PhasedExecutorService cause the app
-         * to hang. The ManagedThreadFactory want an "application component
-         * context" and Arquillian is what it is so I wouldn't expect more.
-         * Anyways, whatever works:
-         */
-        PhasedExecutorService executor = new PhasedExecutorService();
+        PhasedExecutorService executor = new PhasedExecutorService(threadFactory);
         final int threadCount = executor.getThreadCount();
         
-        Callable<?> task = Executors.callable(bean::sleepOneSecond);
-        executor.invokeManyTimes(task, threadCount);
+        executor.invokeManyTimes(bean::sleepOneSecond, threadCount);
         
         assertEquals("Expected all but one thread to arrive concurrently.",
                 threadCount - 1, ConcurrentInvocationCounter.getConcurrentCallsCount());

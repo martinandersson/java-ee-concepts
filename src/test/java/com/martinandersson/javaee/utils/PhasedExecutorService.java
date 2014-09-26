@@ -1,6 +1,7 @@
 package com.martinandersson.javaee.utils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -12,6 +13,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.Phaser;
@@ -71,7 +73,7 @@ import java.util.stream.IntStream;
  * 
  * @author Martin Andersson (webmaster at martinandersson.com)
  */
-public class PhasedExecutorService implements ExecutorService
+public class PhasedExecutorService implements ExecutorService, AutoCloseable
 {
     private final AtomicBoolean isExecutingTasks = new AtomicBoolean();
     
@@ -169,6 +171,20 @@ public class PhasedExecutorService implements ExecutorService
     }
     
     /**
+     * Delegates to {@linkplain #invokeManyTimes(Callable, int)}.
+     * 
+     * @param task the logic to execute concurrently..
+     * @param count ..for this many times
+     * 
+     * @return all futures for management of the tasks
+     */
+    public List<Future<Void>> invokeManyTimes(Runnable task, int count) {
+        Callable<Void> callable = Executors.callable(task, null);
+        List<Callable<Void>> copies = Collections.nCopies(count, callable);
+        return invokeAll(copies);
+    }
+    
+    /**
      * Is equivalent to {@linkplain #invokeAll(Collection)
      * invokeAll(java.util.Collection)}, only that this method accept one single
      * task that will be copied into a list of equal size to the provided
@@ -180,11 +196,27 @@ public class PhasedExecutorService implements ExecutorService
      * @param task the logic to execute concurrently..
      * @param count ..for this many times
      * 
-     * @return all futures for management of task and retrieval of result
+     * @return all futures for management of the tasks and retrieval of their result
      */
     public <T> List<Future<T>> invokeManyTimes(Callable<T> task, int count) {
         List<Callable<T>> copies = Collections.nCopies(count, task);
         return invokeAll(copies);
+    }
+    
+    /**
+     * Is equivalent to {@linkplain #invokeAll(Collection)
+     * invokeAll(java.util.Collection)}, only with a different method signature.
+     * 
+     * @param <T> type of result
+     * @param task to execute
+     * @param more tasks to execute
+     * 
+     * @return all futures for management of the tasks and retrieval of their result
+     */
+    public <T> List<Future<T>> invokeAll(Callable<T> task, Callable<T>... more) {
+        List<Callable<T>> callables = new ArrayList<>(Arrays.asList(more)); // Copy? Client provided array write through and vice versa.
+        callables.add(0, task);
+        return invokeAll(callables);
     }
 
     /**
@@ -203,7 +235,7 @@ public class PhasedExecutorService implements ExecutorService
      * @throws IllegalArgumentException if fewer tasks than worker threads is
      *         supplied
      * 
-     * @return all futures for management of task and retrieval of result
+     * @return all futures for management of the tasks and retrieval of their result
      */
     @Override
     public <T> List<Future<T>> invokeAll(Collection<? extends Callable<T>> tasks) {
@@ -257,27 +289,24 @@ public class PhasedExecutorService implements ExecutorService
         
         Runnable waitForCompletion = () -> {
             try { finished.await(); }
-            catch (InterruptedException | BrokenBarrierException e) { ; }
+            catch (InterruptedException | BrokenBarrierException e) {}
         };
+        
+        final int batchableSize = size - (size % threadCount); // <-- we don't phase residue tasks
         
         IntStream.range(0, threadCount).forEach(x -> threadFactory.newThread(() -> {
             FutureTask<T> task;
-            while (shutdown == false && (task = __tasks.poll()) != null)
-            {
-                final int hasExecuted = pickedTasks.getAndIncrement();
+            
+            while (shutdown == false && (task = __tasks.poll()) != null) {
+                final int pickedByOthers = pickedTasks.getAndIncrement();
                 
                 if (task.isCancelled())
                     continue;
                 
-                /*
-                 * Use phaser if buddies are already waiting, otherwise
-                 * calculate wether or not we have enough tasks left for a
-                 * new phase, in which case we accept to be the first thread
-                 * waiting for other workers.
-                 */
-
-                if (phaser.getArrivedParties() > 0 || (size - hasExecuted) >= threadCount)
+                if (pickedByOthers < batchableSize) {
                     phaser.arriveAndAwaitAdvance();
+                }
+                // else, run unphased!
                 
                 if (phaser.isTerminated()) {
                     break;
@@ -403,9 +432,21 @@ public class PhasedExecutorService implements ExecutorService
     public void execute(Runnable command) throws UnsupportedOperationException {
         throw new UnsupportedOperationException("Use a real executor service.");
     }
-    
-    
-    
+
+    /**
+     * Full implementation:
+     * <pre>{@code
+     * 
+     *     this.shutdownNow();
+     * 
+     * }</pre>
+     * 
+     * @see #shutdownNow()
+     */
+    @Override
+    public void close() {
+        shutdownNow();
+    }
     
     
     
