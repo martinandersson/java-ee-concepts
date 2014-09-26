@@ -1,5 +1,6 @@
 package com.martinandersson.javaee.utils;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
@@ -8,6 +9,7 @@ import java.io.OutputStream;
 import java.io.Serializable;
 import java.io.UncheckedIOException;
 import java.net.HttpURLConnection;
+import java.net.ProtocolException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Objects;
@@ -31,6 +33,61 @@ public final class HttpRequests
         // Empty
     }
     
+    
+    
+    /*
+     *  --------------
+     * | EXTERNAL API |
+     *  --------------
+     */
+    
+    /**
+     * Will make a GET-request to the provided Servlet test driver and return
+     * the raw response body as a {@code byte[]}.<p>
+     * 
+     * Servlets that do not respond with anything will make the client see a
+     * a byte array of zero length.<p>
+     * 
+     * The purpose of this method is most likely to "ping" a Servlet; make him
+     * do stuff upon receiving a GET request. For this purpose, client code is
+     * not interested in raw bytes sent back.<p>
+     * 
+     * Otherwise (if the response matters), consider using
+     * {@linkplain #getObject(URL, Class, HttpRequests.RequestParameter...)
+     * getObject(URL, Class, RequestParameter...)}.
+     * 
+     * Do note that the underlying Java entity used to make the GET-request is
+     * {@code HttpURLConnection} which most likely uses pooled connections.
+     * Therefore, invoking this method in a concurrent test has limited effects.
+     * Consider using a Socket instead (which we will add in this class in the
+     * future, or change the implementation of this method).
+     * 
+     * @param url deployed application URL ("application context root"),
+     *            provided by Arquillian
+     * @param testDriverType the test driver class
+     * @param parameters each parameter will be added to the GET-request
+     * 
+     * @return object returned by the test driver
+     */
+    public static byte[] getBytes(URL url, Class<?> testDriverType, RequestParameter... parameters) {
+        final URLConnection conn = getNonPersistentConnection(url, testDriverType, parameters);
+        
+        try (InputStream in = conn.getInputStream()) {
+            ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+            
+            int signedByte;
+            
+            while ((signedByte = in.read()) != -1) {
+                buffer.write(signedByte);
+            }
+            
+            return buffer.toByteArray();
+        }
+        catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
+    
     /**
      * Will make a GET-request to the provided Servlet test driver and return an
      * expected Java object as response.<p>
@@ -49,20 +106,8 @@ public final class HttpRequests
      * 
      * @return object returned by the test driver
      */
-    public static <T> T getObject(URL url, Class<?> testDriverType, RequestParameter... parameters) {
-        final URL testDriver;
-        final URLConnection conn;
-        final String query = RequestParameter.buildQuery(parameters);
-        
-        try {
-            testDriver = new URL(url, testDriverType.getSimpleName() + query);
-            conn = testDriver.openConnection();
-        }
-        catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
-        
-        conn.setRequestProperty("Connection", "close");
+    public static <T> T getObject(URL url, Class<?> testDriverType, RequestParameter... parameters) { 
+        final URLConnection conn = getNonPersistentConnection(url, testDriverType, parameters);
         
         try (ObjectInputStream in = new ObjectInputStream(conn.getInputStream());) {
             return (T) in.readObject();
@@ -99,23 +144,17 @@ public final class HttpRequests
         Objects.requireNonNull(toSend);
         
         final URL testDriver; // = new URL(url, testDriverType.getSimpleName());
-        final HttpURLConnection conn;
+        final HttpURLConnection conn = getNonPersistentConnection(url, testDriverType);
         
         try {
-            testDriver = new URL(url, testDriverType.getSimpleName());
-            conn = (HttpURLConnection) testDriver.openConnection();
             conn.setRequestMethod("POST");
         }
-        catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
-        catch (ClassCastException e) {
-            throw new IllegalArgumentException("Provided url is not a HTTP URI", e);
+        catch (ProtocolException e) {
+            throw new AssertionError("POST is supported and yes, URLConnection is known to have a bad API design.");
         }
         
         conn.setDoOutput(true);
         conn.setRequestProperty("Content-Type", "application/octet-stream");
-        conn.setRequestProperty("Connection", "close");
         
         try (OutputStream raw = conn.getOutputStream();
              ObjectOutputStream writer = new ObjectOutputStream(raw);) {
@@ -141,6 +180,8 @@ public final class HttpRequests
         }
     }
     
+    
+
     
     
     public static class RequestParameter
@@ -169,6 +210,42 @@ public final class HttpRequests
         
         public final String asKeyValue() {
             return key + "=" + value;
+        }
+    }
+    
+    
+    
+    /*
+     *  --------------
+     * | INTERNAL API |
+     *  --------------
+     */
+    
+    /**
+     * Will transform provided arguments into a {@code HttpURLConnection}
+     * against the test Servlet.
+     * 
+     * @param url application context root, as provided by Arquillian
+     * @param testDriverType test driver class
+     * @param parameters optional request parameters
+     * 
+     * @return a connection against the test Servlet
+     * 
+     * @throws IllegalArgumentException if provided URL is not a HTTP URI
+     */
+    private static HttpURLConnection getNonPersistentConnection(URL url, Class<?> testDriverType, RequestParameter... parameters) {
+        try {
+            String query = RequestParameter.buildQuery(parameters);
+            URL testDriver = new URL(url, testDriverType.getSimpleName() + query);
+            HttpURLConnection conn = (HttpURLConnection) testDriver.openConnection();
+            conn.setRequestProperty("Connection", "close");
+            return conn;
+        }
+        catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+        catch (ClassCastException e) {
+            throw new IllegalArgumentException("Provided URL is not a HTTP URI", e);
         }
     }
 }
