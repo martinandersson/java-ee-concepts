@@ -62,10 +62,15 @@ public final class HttpRequests
         try (ObjectInputStream in = new ObjectInputStream(conn.getInputStream());) {
             return (T) in.readObject();
         }
-        catch (IOException | ClassNotFoundException e) {
+        catch (IOException e) {
             // Might be that you haven't packaged all dependent class files with the @Deployment?
             // Servlet or endpoint your trying to call isn't properly implemented?
-            throw new RuntimeException(e);
+            throw new UncheckedIOException(e);
+        }
+        catch (ClassNotFoundException e) {
+            throw new AssertionError("Got object of unknown type.", e);
+        }
+    }
         }
     }
     
