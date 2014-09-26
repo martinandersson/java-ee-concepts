@@ -45,14 +45,14 @@ public final class HttpRequests
      * @param url deployed application URL ("application context root"),
      *            provided by Arquillian
      * @param testDriverType the test driver class
-     * @param headers each header entry will be added to the GET-request
+     * @param parameters each parameter will be added to the GET-request
      * 
      * @return object returned by the test driver
      */
-    public static <T> T getObject(URL url, Class<?> testDriverType, RequestParameter... headers) {
+    public static <T> T getObject(URL url, Class<?> testDriverType, RequestParameter... parameters) {
         final URL testDriver;
         final URLConnection conn;
-        final String query = RequestParameter.buildQuery(headers);
+        final String query = RequestParameter.buildQuery(parameters);
         
         try {
             testDriver = new URL(url, testDriverType.getSimpleName() + query);
