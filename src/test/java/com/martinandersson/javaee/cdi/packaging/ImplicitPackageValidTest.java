@@ -15,13 +15,33 @@ import org.junit.runner.RunWith;
  * deployment archive, meaning that the archive is an "implicit bean archive" in
  * which only annotated beans are eligible for CDI management.<p>
  * 
+ * 
+ * 
+ * <h3>GlassFish bug #1</h3>
+ * 
  * Scope types are "bean defining annotations". WildFly and my understanding of
  * all related Java EE specifications also make
  * {@code @javax.annotation.ManagedBean} a bean defining annotation. GlassFish
  * disagree. I posted a question about it on
  * <a href="http://stackoverflow.com/questions/25327057">Stackoverflow.com</a>
  * but until the final verdict arrive, I leave out injection of a
- * {@code @ManagedBean} from this test as it will crash GlassFish.
+ * {@code @ManagedBean} from this test as it will crash GlassFish.<p>
+ * 
+ * 
+ * 
+ * <h3>GlassFish bug #2</h3>
+ * 
+ * No GlassFish version that I've tried (4.0.1-b08 and 4.1) doesn't want to
+ * pickup the CDI inspector. GF 4.0.1-b08 pass the test with the CDI inspector
+ * installed. GlassFish 4.1 however doesn't ({@code requestScoped == null}).
+ * Looking in the log reveal a suspicious message: "BeanManager not found".
+ * Adding the {@code beans.xml} file would solve this problem (still not pick up
+ * the CDI inspector) but that would make this archive an explicit one. For now,
+ * I'll leave the CDI inspector out of the game.<p>
+ * 
+ * TODO: File a bug.
+ * 
+ * 
  * 
  * @author Martin Andersson (webmaster at martinandersson.com)
  */
@@ -30,8 +50,10 @@ public class ImplicitPackageValidTest
 {
     @Deployment
     public static WebArchive buildDeployment() {
-        WebArchive war = Deployments.buildWAR(ImplicitPackageValidTest.class, CalculatorRequestScoped.class);
-        return Deployments.installCDIInspector(war);
+        return Deployments.buildWAR(ImplicitPackageValidTest.class, CalculatorRequestScoped.class);
+        
+        // Causes GF 4.1 to fail the test:
+//        return Deployments.installCDIInspector(war);
     }
 
     @Inject

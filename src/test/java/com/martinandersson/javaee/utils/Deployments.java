@@ -2,13 +2,13 @@ package com.martinandersson.javaee.utils;
 
 import com.martinandersson.javaee.resources.ArquillianDS;
 import com.martinandersson.javaee.resources.CDIInspector;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Set;
 import java.util.logging.Level;
@@ -173,17 +173,15 @@ public final class Deployments
      * Will install {@linkplain CDIInspector} as a CDI extension in the provided
      * archive.<p>
      * 
-     * Note that this will not fuck up the bean archive's type definition
+     * Note that this will not screw up the bean archive's type definition
      * (otherwise, archives with a CDI extension is a not a bean archive). The
      * extension is installed as its own library.<p>
      * 
      * Note also that it is indeterministic what happens if an extension has
      * already been installed in the provided archive. Maybe Armageddon.<p>
      * 
-     * Also note that the CDI inspector only work on WildFly, if "beans.xml" is
-     * provided with the archive. GlassFish doesn't pick up the extension at
-     * all. I guess that GlassFish want the extension deployed separately.
-     * Haven't looked into that yet.
+     * Also note that the CDI inspector only work on WildFly. GlassFish doesn't
+     * pick up the extension at all. Haven't looked into that yet.
      * 
      * @param <T> type need to be an {@code Archive} that implements {@code
      *        ManifestContainer} and {@code LibraryContainer}
@@ -198,49 +196,56 @@ public final class Deployments
             T installCDIInspector(T archive)
     {
         if (!archive.contains("WEB-INF/beans.xml")) {
-            LOGGER.warning("No \"beans.xml\" file in provided archive. The CDI inspector might not be picked up by WildFly.");
+            LOGGER.warning(() ->
+                    "No \"beans.xml\" file in provided archive. Installing the CDI inspector might cause GlassFish 4.1 to crash.");
         }
         
-        // 1. Make provider configuration file
-        
-        final File providerConfig;
+        final Path temp;
         
         try {
-             providerConfig = Files.createTempFile(null, null).toFile();
+             temp = Files.createTempFile(null, null);
+             
+             /*
+              * Arquillian read the file contents lazily and NIO.2's
+              * StandardOpenOption.DELETE_ON_CLOSE remove the temp file
+              * immediately on stream close. Runtime hooks isn't that pleasant
+              * but a necessary evil:
+              */
+             temp.toFile().deleteOnExit();
         }
         catch (IOException e) {
             throw new UncheckedIOException(e);
         }
         
-        // Not using FileWriter since Java ServiceLoader require UTF-8, so to be sure:
         try (
-            FileOutputStream raw = new FileOutputStream(providerConfig);
+            // Files.newBufferedReader() wouldn't hurt but is still unnecessary for one line of content
+            OutputStream raw = Files.newOutputStream(temp);
+            
+            // Java ServiceLoader require UTF-8 (doesn't say whether BOM should be added or not)
             OutputStreamWriter chars = new OutputStreamWriter(raw, StandardCharsets.UTF_8);) {
+            
+            // All the glorious content
             chars.write(CDIInspector.class.getName());
         }
         catch (IOException e) {
             throw new UncheckedIOException(e);
         }
         
-        // 2. Backup what has already been printed to log
-        
+        // Backup what has already been printed to log
         final Set<String> before = LOGGER.isLoggable(Level.INFO) ?
                 toSet(archive) : null;
         
-        // 3. Put config file in provided archive's META-INF/services folder
+        // Put config file in provided archive's META-INF/services folder
+        archive.addAsManifestResource(temp.toFile(),
+                "services/" + javax.enterprise.inject.spi.Extension.class.getName());
         
-        archive.addAsManifestResource(providerConfig,
-                "services/" + javax.enterprise.inject.spi.Extension.class.getSimpleName());
-        
-        // 4. Make CDIExtension library and put in provided archive
-        
+        // Build CDIExtension library and put in provided archive
         JavaArchive lib = ShrinkWrap.create(JavaArchive.class, CDIInspector.class.getSimpleName() + ".jar")
                 .addClass(CDIInspector.class);
         
         archive.addAsLibrary(lib);
         
-        // 5. Log new contents in accordance with JavaDoc of Deployments
-        
+        // Fulfill JavaDoc log contract of Deployments
         LOGGER.info(() -> {
             Set<String> after = toSet(archive);
             after.removeAll(before);

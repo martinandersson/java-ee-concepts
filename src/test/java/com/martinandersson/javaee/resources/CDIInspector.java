@@ -78,6 +78,12 @@ public class CDIInspector implements Extension // <-- only a marker interface
     
     
     
+    {
+        LOGGER.log(CUSTOM, () -> getClass().getName() + " instance created.");
+    }
+    
+    
+    
     /*
      *  --------------
      * | EXTERNAL API |
