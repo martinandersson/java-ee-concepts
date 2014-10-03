@@ -37,14 +37,15 @@ import java.util.stream.IntStream;
  * 
  * A pulse is executed only if enough tasks has been supplied to feed all worker
  * threads. A residue is executed as-is by free worker threads. For example,
- * configure this service to use 5 threads, but feeding him only with 14 tasks
- * will account for two synchronized pulses, the last 4 tasks will be executed
- * as soon as worker threads become available.<p>
+ * configure this service to use 5 threads, but feeding him with only 14 tasks
+ * will produce two synchronized pulses. The last 4 tasks will be executed as
+ * soon as worker threads become available.<p>
  * 
  * Supplying fewer tasks than worker threads make this executor service unable
- * to execute a pulse. Given that pulses or phases of execution is the entire
- * purpose of this executor service, then that is considered an error and the
- * batch of tasks will be rejected with an {@code IllegalArgumentException}.<p>
+ * to execute a phase. Given that phases or pulses of execution is the entire
+ * purpose of this executor service, then such an input is considered an error
+ * and the batch of tasks will be rejected with an {@code
+ * IllegalArgumentException}.<p>
  * 
  * This executor service should be <strong>used sparingly by test code
  * only</strong> and has two constraints enforcing this contract:
@@ -59,17 +60,18 @@ import java.util.stream.IntStream;
  *       IllegalStateException} will be thrown.</li><br />
  * </ol>
  * 
- * The constraints leave only two task-accepting methods left to use:
- * {@linkplain #invokeAll(java.util.Collection) invokeAll(Collection)} and
- * {@linkplain #invokeAll(java.util.Collection, BeforeEachPhase)
- * invokeAll(Collection, BeforeEachPhase)}. The latter being a specialized
- * method only for {@code PhasedExecutorService} that makes client code able
- * to intercept each phase for debugging or early termination.<p>
+ * The constraints leave few task-accepting methods from the {@linkplain
+ * ExecutorService} interface left to use. The primary choice being
+ * {@linkplain #invokeAll(java.util.Collection) invokeAll(Collection)}. However,
+ * {@code PhasedExecutorService} provide an extended API for easy submission of
+ * tasks. Some methods are particularly customized for test code, such as
+ * {@linkplain #invokeManyTimes(Runnable, int) invokeManyTimes(Runnable, int)} and
+ * {@linkplain #invokeManyTimes(Callable, int) invokeManyTimes(Callable, int)}.<p>
  * 
- * Furthermore, the thread pool is constructed and "destroyed" for each batch
- * of tasks executed. This makes overall memory consumption low and does not
- * require an explicit shutdown by the client as is otherwise the case with
- * executor services.
+ * Also for the benefit of test code, the thread pool is constructed and
+ * "destroyed" for each batch of tasks executed. This makes overall memory
+ * consumption low and does not require an explicit shutdown by the client as is
+ * otherwise the case with executor services on the server-side.
  * 
  * @author Martin Andersson (webmaster at martinandersson.com)
  */
@@ -185,12 +187,17 @@ public class PhasedExecutorService implements ExecutorService, AutoCloseable
     }
     
     /**
-     * Is equivalent to {@linkplain #invokeAll(Collection)
-     * invokeAll(java.util.Collection)}, only that this method accept one single
-     * task that will be copied into a list of equal size to the provided
-     * {@code count}.<p>
+     * Delegates to {@linkplain #invokeAll(Collection)
+     * invokeAll(java.util.Collection)}.<p>
+     * 
+     * The argument supplied is the task supplied to this method, copied many
+     * times over into a {@code Collection<Callable<T>>} of equal size to the
+     * provided {@code count}.<p>
      * 
      * The task must be thread-safe given that it will be executed concurrently.
+     * With thread-safety, we mean a task with minimum side-effects and no
+     * mutable state. Explicit thread synchronization of the task, given the
+     * use-case of this executor service, is anti-pattern.
      * 
      * @param <T> type of result
      * @param task the logic to execute concurrently..
@@ -457,12 +464,12 @@ public class PhasedExecutorService implements ExecutorService, AutoCloseable
      */
     
     /**
-     * Callback invoked before each new phase or pulse is executed. 
+     * Callback invoked before each new phase is executed.
      */
     @FunctionalInterface
     public interface BeforeEachPhase {
         /**
-         * Callback invoked before each new phase or pulse is executed.
+         * Callback invoked before each new phase is executed.
          * 
          * @param phase the next phase, starts at {@code 0}
          * 
