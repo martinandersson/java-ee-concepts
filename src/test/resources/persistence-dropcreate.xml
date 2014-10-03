@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+
+    There's no "explaining" and tutoring comments in this file. See file
+    "persistence-update.xml" for all relevant documentation.
+
+-->
+
+<persistence
+    version="2.1"
+    xmlns="http://xmlns.jcp.org/xml/ns/persistence"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd">
+  <persistence-unit name="arquillian-pu" transaction-type="JTA">
+    <jta-data-source>java:app/env/ArquillianDS</jta-data-source>
+    <exclude-unlisted-classes>false</exclude-unlisted-classes>
+    <shared-cache-mode>DISABLE_SELECTIVE</shared-cache-mode>
+    
+    <properties>
+        
+        <!--
+            EclipseLink's property for schema generation doesn't drop and
+            create as one might think. The property drop, create and then drop.
+            Hence, tables won't be left behind after the test..
+        -->
+        <!--<property name="eclipselink.ddl-generation" value="drop-and-create-tables"/>-->
+        
+        <!--
+            ..but EclipseLink support JPA 2.1's schema generation property and
+            does exactly what is expected:
+        -->
+        <property name="javax.persistence.schema-generation.database.action" value="drop-and-create"/>
+        
+        <!--
+            Hibernate, despite claims to support JPA 2.1, does not support the
+            previous property. Closest match is the vendor-specific property
+            provided next. The problem here is that Hibernate will drop the
+            tables after test execution. Thus you cannot see the tables in the
+            database after the test if you executed the test using
+            WildFly/Hibernate.
+        -->
+        <property name="hibernate.hbm2ddl.auto" value="create-drop"/>
+        
+        
+        <property name="hibernate.dialect" value="org.hibernate.dialect.DerbyTenSevenDialect"/>
+        <property name="eclipselink.target-database" value="JavaDB"/>
+        
+        <property name="wildfly.jpa.twophasebootstrap" value="false" />
+    </properties>
+  </persistence-unit>
+</persistence>

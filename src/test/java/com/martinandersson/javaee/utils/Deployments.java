@@ -2,6 +2,7 @@ package com.martinandersson.javaee.utils;
 
 import com.martinandersson.javaee.resources.ArquillianDS;
 import com.martinandersson.javaee.resources.CDIInspector;
+import com.martinandersson.javaee.resources.SchemaGenerationStrategy;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -98,12 +99,13 @@ public final class Deployments
      * persistence.xml} file (persistence unit configuration) and a Java DB
      * client diver which WildFly doesn't have.
      * 
+     * @param strategy strategy to use for schema generation
      * @param testClass calling test class
      * @param include which classes to include, may be none
      * 
      * @return the archive
      */
-    public static WebArchive buildPersistenceArchive(Class<?> testClass, Class<?>... include) {
+    public static WebArchive buildPersistenceArchive(SchemaGenerationStrategy strategy, Class<?> testClass, Class<?>... include) {
         // Append datasource definition to the include list:
         include = Arrays.copyOf(include, include.length + 1);
         include[include.length - 1] = ArquillianDS.class;
@@ -122,7 +124,7 @@ public final class Deployments
         
         WebArchive war = createWAR(testClass, include)
                 .addAsLibrary(DERBY_DRIVER)
-                .addAsResource("persistence.xml", "META-INF/persistence.xml");
+                .addAsResource(strategy.getFilename(), "META-INF/persistence.xml");
         
         return log(war);
     }
@@ -221,7 +223,7 @@ public final class Deployments
             // Files.newBufferedReader() wouldn't hurt but is still unnecessary for one line of content
             OutputStream raw = Files.newOutputStream(temp);
             
-            // Java ServiceLoader require UTF-8 (doesn't say whether BOM should be added or not)
+            // Java ServiceLoader require UTF-8
             OutputStreamWriter chars = new OutputStreamWriter(raw, StandardCharsets.UTF_8);) {
             
             // All the glorious content

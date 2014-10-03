@@ -1,16 +1,13 @@
 package com.martinandersson.javaee.arquillian.persistence;
 
-import com.martinandersson.javaee.resources.ArquillianDS;
+import com.martinandersson.javaee.resources.SchemaGenerationStrategy;
 import com.martinandersson.javaee.utils.Deployments;
 import java.util.List;
 import java.util.logging.Logger;
 import javax.inject.Inject;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
-import org.jboss.shrinkwrap.api.ShrinkWrap;
-import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
-import org.jboss.shrinkwrap.resolver.api.maven.Maven;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import org.junit.Test;
@@ -241,6 +238,7 @@ public class PersistenceTest
     @Deployment
     private static WebArchive buildDeployment() {
         return Deployments.buildPersistenceArchive(
+                SchemaGenerationStrategy.UPDATE,
                 PersistenceTest.class,
                 PersonRepository.class,
                 Person.class,

@@ -1,13 +1,3 @@
-package com.martinandersson.javaee.jpa.mapping.elementcollection;
-
-import com.martinandersson.javaee.utils.Deployments;
-import javax.inject.Inject;
-import org.jboss.arquillian.container.test.api.Deployment;
-import org.jboss.arquillian.junit.Arquillian;
-import org.jboss.shrinkwrap.api.spec.WebArchive;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-
 /**
  * JPA 2.1, section "2.6 Collections of Embeddable Classes and Basic Types":
  * <pre>{@code
@@ -33,14 +23,20 @@ import org.junit.runner.RunWith;
  * 
  * }</pre>
  * 
+ * 
  * My understanding of section 2.6 and 11.1.14 is that {@code @ElementCollection}
  * is optional and may be left out. Only if added shall the collection be mapped
  * to his own table. GlassFish and EclipseLink work in this way, WildFly and
  * Hibernate crash upon deployment.<p>
  * 
- * In order to make this test work for WildFly, you must not deploy {@code
- * Person1.class} and therefore you cannot execute test
- * {@code elementCollectionOptional()}.<p>
+ * In order to make at least one of the provided two tests work on WildFly (the
+ * one that uses {@code @ElementCollection}; {@code
+ * ElementCollectionSeparateTableTest}), they have been split into separate
+ * files and separate deployments.<p>
+ * 
+ * Using Arquillian's techniques for multiple deployments (i.e.
+ * {@code @Deployment(name = "name")} and {@code @OperateOnDeployment("name")})
+ * won't bypass this issue.<p>
  * 
  * Bug filed here:
  * <pre>{@code
@@ -48,31 +44,5 @@ import org.junit.runner.RunWith;
  *     https://hibernate.atlassian.net/browse/HHH-9402
  * 
  * }</pre>
- * 
- * @author Martin Andersson (webmaster at martinandersson.com)
  */
-@RunWith(Arquillian.class)
-public class ElementCollectionTest
-{
-    @Deployment
-    public static WebArchive buildArchive() {
-        return Deployments.buildPersistenceArchive(
-                ElementCollectionTest.class,
-                Person1.class,
-                Person2.class,
-                Repository.class);
-    }
-    
-    @Inject
-    Repository persons;
-    
-    @Test
-    public void elementCollectionOptional() {
-        persons.persist(new Person1("Person1_nick1", "Person1_nick2"));
-    }
-    
-    @Test
-    public void elementCollectionInSeparateTable() {
-        persons.persist(new Person2("Person2_nick1", "Person2_nick2"));
-    }
-}
+package com.martinandersson.javaee.jpa.mapping.elementcollection;
