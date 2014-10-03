@@ -15,7 +15,11 @@ Next stop, read:
 Required of you
 ---
 * JDK 8
-* Either GlassFish 4 or WildFly 8 installed and running
+* Either GlassFish 4 or WildFly 8 installed and running (profiles included for both)
+
+Failing tests?
+---
+Not all tests are passed by GlassFish and WildFly. One could argue that is by design. The test code in this project work hard to demonstrate and explore technologies outlined in related Java EE specifications. The test code does not cater to limitations of Java EE product providers. If a test fail, go to the source code file. Read JavaDoc and other source code comments. Chances are high that the issue you ran into has been thoroughly described and reported as a bug somewhere.
 
 Contributors
 ---
