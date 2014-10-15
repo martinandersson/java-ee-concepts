@@ -247,13 +247,21 @@ public class TestDriver extends HttpServlet
          * manage the life cycle of our stateful beans (idle beans may also
          * timeout and be removed by the server). We have created them using
          * @EJB, now we must destroy them. Which is what we do in this method
-         * just before the servlet goes down =)
+         * just before the servlet goes down by using the @Remove annotated
+         * method of the stateful =)
          * 
-         * If we don't want to bother with the @Remove method ourselves, then we
-         * can let CDI do our job. Switch @EJB to @Inject and we get a
-         * "contextual" instance with a scope. The scope is by default
-         * @Dependent which is exactly what we want here. A "contextual"
-         * stateful bean doesn't even need to have a @Remove method declared.
+         * If we don't want to bother with the creation and the destruction of
+         * a stateful bean, then we can let CDI do our job. Switch @EJB to
+         * @Inject and we get a "contextual" instance with a scope. The scope is
+         * by default @Dependent which is what we want in this dumb application.
+         * 
+         * Non-dumb applications use a "normal" scope, i.e. @RequestScoped or
+         * @SessionScoped for example. A "contextual" stateful doesn't need to
+         * have a @Remove method declared and should most likely not have one
+         * either. It is an error by the application to use the @Remove method
+         * on a contextual stateful bean that has a normal scope, CDI is the one
+         * supposed to do the job! See the CDI 1.1 specification, section
+         * "3.2.1 EJB remove methods of session beans" for details.
          * 
          * Using @Inject with stateful beans isn't a dumb idea. For the life
          * time of this servlet instance, the bean references will always point
