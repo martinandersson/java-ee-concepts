@@ -29,9 +29,6 @@ public enum SchemaGenerationStrategy
     UPDATE("persistence-update.xml"),
     
     /**
-     * In case of Hibernate, will drop-create-drop: meaning that the tables
-     * won't be left behind after the test is run.
-     * 
      * All tables will be 1) dropped and then 2) created.<p>
      * 
      * WildFly that uses Hibernate has a third side-effect: Hibernate drop the
