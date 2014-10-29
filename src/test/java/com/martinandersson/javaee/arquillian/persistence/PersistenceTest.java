@@ -4,7 +4,7 @@ import com.martinandersson.javaee.resources.SchemaGenerationStrategy;
 import com.martinandersson.javaee.utils.Deployments;
 import java.util.List;
 import java.util.logging.Logger;
-import javax.inject.Inject;
+import javax.ejb.EJB;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
@@ -269,7 +269,7 @@ public class PersistenceTest
                 Address.class);
     }
     
-    @Inject
+    @EJB
     PersonRepository persons;
     
     /**

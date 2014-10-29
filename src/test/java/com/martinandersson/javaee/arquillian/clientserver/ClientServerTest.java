@@ -14,7 +14,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import javax.inject.Inject;
+import javax.ejb.EJB;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.RunAsClient;
 import org.jboss.arquillian.junit.Arquillian;
@@ -59,7 +59,7 @@ public class ClientServerTest
     @Rule
     public TestName name = new TestName();
     
-    @Inject
+    @EJB
     HelloWorldEJB helloWorldEJB;
     
     @Deployment

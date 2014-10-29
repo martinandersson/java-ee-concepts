@@ -2,7 +2,7 @@ package com.martinandersson.javaee.arquillian.helloworld;
 
 
 import java.util.logging.Logger;
-import javax.inject.Inject;
+import javax.ejb.EJB;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
@@ -227,7 +227,7 @@ public class HelloWorldTest
     @Rule
     public TestName name = new TestName();
     
-    @Inject
+    @EJB
     HelloWorldEJB helloWorldEJB;
     
     @Deployment
