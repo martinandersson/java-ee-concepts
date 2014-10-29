@@ -96,8 +96,9 @@ public final class Deployments
     /**
      * Will build an archive that in addition to the provided classes, also
      * include {@code ArquillianDS.class} (data source definition), the {@code
-     * persistence.xml} file (persistence unit configuration) and a Java DB
-     * client diver which WildFly doesn't have.
+     * persistence.xml} file (persistence unit configuration), a Java DB client
+     * diver which WildFly doesn't have and finally, an empty {@code beans.xml}
+     * file so that all classes become eligible for CDI lookup.
      * 
      * @param strategy strategy to use for schema generation
      * @param testClass calling test class
@@ -124,7 +125,8 @@ public final class Deployments
         
         WebArchive war = createWAR(testClass, include)
                 .addAsLibrary(DERBY_DRIVER)
-                .addAsResource(strategy.getFilename(), "META-INF/persistence.xml");
+                .addAsResource(strategy.getFilename(), "META-INF/persistence.xml")
+                .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml");
         
         return log(war);
     }

@@ -109,7 +109,7 @@
  * bean-discovery-mode} has been set to {@code annotated}.<p>
  * 
  * By definition therefore, pritty much all archives used in modern web
- * applications, which lack the the {@code beans.xml} file, are implicit bean
+ * applications, which lack the {@code beans.xml} file, are implicit bean
  * archives; processed by the CDI container in a hunt for annotated beans he can
  * manage and make use of. If you're a good sport that make use of annotations,
  * then you don't have to bother about the {@code beans.xml} file either.<p>
