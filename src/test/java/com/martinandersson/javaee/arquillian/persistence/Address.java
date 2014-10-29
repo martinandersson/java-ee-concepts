@@ -12,6 +12,8 @@ public class Address
 {
     private String street, city;
     
+    
+    
     public String getStreet() {
         return street;
     }
@@ -39,8 +41,7 @@ public class Address
      */
     
     @Override
-    public String toString()
-    {
+    public String toString() {
         return new StringBuilder(Address.class.getSimpleName())
                 .append("[")
                   .append("street=").append(street)

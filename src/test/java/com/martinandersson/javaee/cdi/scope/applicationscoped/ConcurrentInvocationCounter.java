@@ -35,8 +35,7 @@ public class ConcurrentInvocationCounter
     
     
     
-    public void sleepOneSecond()
-    {
+    public void sleepOneSecond() {
         if (isSleeping.getAndSet(true)) {
             concurrentCalls.increment();
             return;

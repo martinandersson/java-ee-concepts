@@ -16,7 +16,10 @@ import javax.persistence.Version;
  * 2.5.2 and Hibernate 4.3.5. The JDK 8 library can still be used in JPA
  * entities. Java 1.8 syntax and latest GlassFish/WildFly servers have no
  * problem with Java 1.8 syntax in application components such as EJB:s (GF
- * 4.0.0 break).
+ * 4.0.0 break).<p>
+ * 
+ * Note that this person will use a table in a specific schema called
+ * "ARQUILLIAN_PERSISTENCE".
  * 
  * @author Martin Andersson (webmaster at martinandersson.com)
  */
@@ -75,8 +78,7 @@ public class Person // note 1
      */
     
     @Override
-    public String toString()
-    {
+    public String toString() {
         return new StringBuilder(Person.class.getSimpleName())
                 .append("[")
                   .append("id=").append(id)

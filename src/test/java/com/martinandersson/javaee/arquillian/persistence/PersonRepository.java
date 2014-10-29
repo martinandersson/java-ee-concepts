@@ -26,8 +26,7 @@ public class PersonRepository
     
     
     @TransactionAttribute(TransactionAttributeType.SUPPORTS) // <-- SELECT doesn't have to be executed in a transaction
-    public boolean exists(String name)
-    {
+    public boolean exists(String name) {
         CriteriaQuery<Long> queryForLong = em.getCriteriaBuilder().createQuery(Long.class);
         Root<Person> personTable = queryForLong.from(Person.class);
         
@@ -45,18 +44,16 @@ public class PersonRepository
     }
     
     @TransactionAttribute(TransactionAttributeType.SUPPORTS)
-    public List<Person> findByName(String name)
-    {
+    public List<Person> findByName(String name) {
         PersonQuery person = createQueryForPersons();
-        Predicate nameEquality = createPredicateForNameEquality(person, name);
+        Predicate nameEquality = createPredicateForNameEquality(person.root, name);
         person.query.where(nameEquality);
         
         return em.createQuery(person.query).getResultList();
     }
     
     @TransactionAttribute(TransactionAttributeType.SUPPORTS)
-    public List<Person> findByAddress(Address address)
-    {
+    public List<Person> findByAddress(Address address) {
         PersonQuery person = createQueryForPersons();
         Predicate addressEquality = createPredicateForAddressEquality(person, address);
         person.query.where(addressEquality);
@@ -85,18 +82,13 @@ public class PersonRepository
      *  --------------
      */
     
-    private PersonQuery createQueryForPersons()
-    {
+    private PersonQuery createQueryForPersons() {
         CriteriaQuery<Person> query = em.getCriteriaBuilder().createQuery(Person.class);
         Root<Person> root = query.from(Person.class);
         
         query.select(root); // <-- select() is optional in EclipseLink (who will assume the Person root)
         
         return new PersonQuery(query, root);
-    }
-    
-    private Predicate createPredicateForNameEquality(PersonQuery query, String name) {
-        return createPredicateForNameEquality(query.root, name);
     }
     
     private Predicate createPredicateForNameEquality(Root<Person> personTable, String name) {
@@ -122,8 +114,7 @@ public class PersonRepository
      * CriteriaQuery.getRoots()}. That returns a {@code Set} though and require
      * a bit of boilerplate client code to get and use it right.
      */
-    private static class PersonQuery
-    {
+    private static class PersonQuery {
         final CriteriaQuery<Person> query;
         final Root<Person> root;
         

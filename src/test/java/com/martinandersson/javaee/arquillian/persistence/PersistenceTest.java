@@ -108,13 +108,16 @@ import org.junit.runner.RunWith;
  * 
  * <h3>Data Source and JTA</h3>
  * 
- * According to the JavaDoc of {@code javax.sql.DataSource}, a data source is:
+ * According to the JavaDoc of {@code javax.sql.DataSource}, a data source
+ * is<sup>1</sup>:
  * 
  * <pre>{@code
- *     "A factory for connections to the physical data source that this
- *      DataSource object represents. [A] DataSource object is the preferred
- *      means of getting a connection. [..] The DataSource interface is
- *      implemented by a driver vendor." (note 1)
+ * 
+ *     A factory for connections to the physical data source that this
+ *     DataSource object represents. [A] DataSource object is the preferred
+ *     means of getting a connection. [..] The DataSource interface is
+ *     implemented by a driver vendor.
+ * 
  * }</pre>
  * 
  * The persistence unit configuration must point to a named data source that the
@@ -152,11 +155,12 @@ import org.junit.runner.RunWith;
  * never "distributed" across the network. The transaction is "distributed" in
  * the sense that it should involve more than just one resource. In our case, we
  * enlist only one transaction-aware resource; the database. So we could manage
- * without JTA. Had we used more resources than so, say a JMS queue too, then we
- * must use a JTA transaction. However, since we want the application server to
- * manage transaction boundaries for us, then we are required to use a JTA
- * transaction anyways (note 2). So JTA transactions is the normal case even
- * though most applications technically speaking don't need one.<p>
+ * without JTA. Had we used more resources than so, say a JMS queue or a second
+ * database, then we must use a JTA transaction. However, since we want the
+ * application server to manage transaction boundaries for us, then we are
+ * required to use a JTA transaction anyways<sup>2</sup>. So JTA transactions is
+ * the normal case even though most applications technically speaking don't need
+ * one.<p>
  * 
  * 
  * 
@@ -224,9 +228,29 @@ import org.junit.runner.RunWith;
  * to design and write application code. Use Arquillian and ShrinkWrap to
  * explore this wasteland. Comment statements out, change them, add annotations,
  * do whatever you want to and then run the test again. Simple as that. Make use
- * of this possibility.
+ * of this possibility.<p>
  * 
  * 
+ * 
+ * <h3>Note 1</h3>
+ * 
+ * For your future reference, the JDBC-, JTA- and JTS specifications all refer
+ * to the driver as a "resource adapter" for the "resource manager" which is the
+ * actual RDBMS server.
+ * 
+ * 
+ * <h3>Note 2</h3>
+ * If you want to know more, google "container-managed transactions" or "CMT"
+ * for short which is what the {@code PersonRepository} bean use. Also note that
+ * JTA is required for the {@code UserTransaction} interface as well (or BMT;
+ * bean-managed transactions). Only the {@code EntityTransaction} interface and
+ * resource-local entity managers may skip JTA completely.<p>
+ * 
+ * One might not feel so great about the fact that we are forced to use
+ * expensive DTP/XA given that we use only one database resource. But in such
+ * case, modern optimizations employed by application servers can vastly reduce
+ * the cost (google "Logging Last Resource" (LLR) or "Last Agent Optimization"
+ * (LAO)).
  * 
  * @author Martin Andersson (webmaster at martinandersson.com)
  */
@@ -253,14 +277,12 @@ public class PersistenceTest
      * Duck returned from database will be massacred.
      */
     @Test
-    public void createOrDeleteDonaldDuck()
-    {
+    public void createOrDeleteDonaldDuck() {
         final String donaldDuck = "Donald Duck";
         
         List<Person> donalds = persons.findByName(donaldDuck);
         
-        if (donalds.isEmpty())
-        {
+        if (donalds.isEmpty()) {
             // Create Donald Duck
             
             LOGGER.info(() -> "Didn't find " + donaldDuck +  ". Will create him.");
@@ -283,8 +305,7 @@ public class PersistenceTest
             assertEquals(1, persons.findByAddress(duckburg).size());
         }
         
-        else
-        {
+        else {
             // Delete Donald Duck
             
             LOGGER.info(() -> "Found Donald Ducks (" + donalds.size() + "): " + donalds);
@@ -296,22 +317,3 @@ public class PersistenceTest
         }
     }
 }
-
-
-
-/*
- * Note 1: For your future reference, the JDBC-, JTA- and JTS specifications all
- *         refer to the driver as a "resource adapter" for the "resource
- *         manager" which would be the actual RDBMS server.
- * 
- * Note 2: If you want to know more, google "container-managed transactions" or
- *         "CMT" for short which is what the PersonRepository bean use. Also
- *         note that JTA is required for the UserTransaction interface as well
- *         (or BMT; bean-managed transactions). Only the EntityTransaction
- *         interface and resource-local entity managers may skip JTA
- *         completely. One might not feel so great about the fact that we are
- *         forced to use expensive DTP/XA given that we use only one database
- *         resource. But in such case, modern optimizations employed by
- *         application servers can vastly reduce the cost (google "Logging Last
- *         Resource" (LLR) or "Last Agent Optimization" (LAO)).
- */
