@@ -70,7 +70,7 @@ public final class HttpRequests
      * @return object returned by the test driver
      */
     public static byte[] getBytes(URL url, Class<?> testDriverType, RequestParameter... parameters) {
-        final URLConnection conn = getNonPersistentConnection(url, testDriverType, parameters);
+        final URLConnection conn = openNonPersistentConnection(url, testDriverType, parameters);
         
         try (InputStream in = conn.getInputStream()) {
             ByteArrayOutputStream buffer = new ByteArrayOutputStream();
@@ -107,7 +107,7 @@ public final class HttpRequests
      * @return object returned by the test driver
      */
     public static <T> T getObject(URL url, Class<?> testDriverType, RequestParameter... parameters) { 
-        final URLConnection conn = getNonPersistentConnection(url, testDriverType, parameters);
+        final URLConnection conn = openNonPersistentConnection(url, testDriverType, parameters);
         
         try (ObjectInputStream in = new ObjectInputStream(conn.getInputStream());) {
             return (T) in.readObject();
@@ -144,7 +144,7 @@ public final class HttpRequests
         Objects.requireNonNull(toSend);
         
         final URL testDriver; // = new URL(url, testDriverType.getSimpleName());
-        final HttpURLConnection conn = getNonPersistentConnection(url, testDriverType);
+        final HttpURLConnection conn = openNonPersistentConnection(url, testDriverType);
         
         try {
             conn.setRequestMethod("POST");
@@ -233,7 +233,7 @@ public final class HttpRequests
      * 
      * @throws IllegalArgumentException if provided URL is not a HTTP URI
      */
-    private static HttpURLConnection getNonPersistentConnection(URL url, Class<?> testDriverType, RequestParameter... parameters) {
+    private static HttpURLConnection openNonPersistentConnection(URL url, Class<?> testDriverType, RequestParameter... parameters) {
         try {
             String query = RequestParameter.buildQuery(parameters);
             URL testDriver = new URL(url, testDriverType.getSimpleName() + query);
