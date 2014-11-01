@@ -75,10 +75,10 @@ public final class HttpRequests
         try (InputStream in = conn.getInputStream()) {
             ByteArrayOutputStream buffer = new ByteArrayOutputStream();
             
-            int signedByte;
+            int b;
             
-            while ((signedByte = in.read()) != -1) {
-                buffer.write(signedByte);
+            while ((b = in.read()) != -1) { // <-- read unsigned byte
+                buffer.write(b);            // <-- write unsigned byte
             }
             
             return buffer.toByteArray();
