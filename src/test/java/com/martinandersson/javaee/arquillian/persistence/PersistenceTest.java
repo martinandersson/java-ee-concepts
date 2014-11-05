@@ -175,6 +175,14 @@ import org.junit.runner.RunWith;
  * use persistence, then we must bundle a "persistence.xml" file with our
  * deployed archive and in it we must define at least one persistence unit.<p>
  * 
+ * The file must be located "in the META-INF directory of the root of the
+ * persistence unit"<sup>3</sup>. What exactly that translates to in English is
+ * well described here:
+ * 
+ * <pre>
+ *     http://docs.oracle.com/javaee/7/tutorial/doc/persistence-intro003.htm
+ * </pre>
+ * 
  * 
  * 
  * <h3>Data source definition</h3>
@@ -251,6 +259,12 @@ import org.junit.runner.RunWith;
  * case, modern optimizations employed by application servers can vastly reduce
  * the cost (google "Logging Last Resource" (LLR) or "Last Agent Optimization"
  * (LAO)).
+ * 
+ * 
+ * <h3>Note 3</h3>
+ * JPA 2.1, section "8.2.1 persistence.xml file".
+ * 
+ * 
  * 
  * @author Martin Andersson (webmaster at martinandersson.com)
  */

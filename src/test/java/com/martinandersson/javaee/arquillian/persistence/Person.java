@@ -32,7 +32,7 @@ public class Person // note 1
     private long id;
     
     @Version
-    private long modCount;
+    private int modCount;
     
     // Is implicitly: @Basic
     private String name;
