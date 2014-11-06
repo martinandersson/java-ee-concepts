@@ -108,8 +108,8 @@ public class CrashingBean {
     }
     
     private void assertCallerTx(Object transactionKey) {
+        assertInTx();
         assertEquals(transactionKey, reg.getTransactionKey());
-        assertEquals(Status.STATUS_ACTIVE, transactionKey);
     }
     
     private void registerRollbackListener() {
