@@ -92,7 +92,7 @@ import org.junit.runner.RunWith;
  * javax.transaction.TransactionalException} that is caused by a {@code
  * javax.transaction.RollbackException}. No traces of the original unchecked
  * exception can be found. Not in the log, and unfortunately not in the
- * exception chain either.<p>
+ * exception cause-chain either.<p>
  * 
  * Is it really a problem? For starters, not having the ability to track the
  * real cause make application handling impossible - so yes. But also, {@code
@@ -112,10 +112,10 @@ import org.junit.runner.RunWith;
  * }</pre>
  * 
  * My gut feeling is that a RollbackException is not what the client expect,
- * because one can not expect the client being the one handling the transaction
- * demarcation. If he do or otherwise has an interest in knowing if the
- * transaction rolled back, then he can simply catch a {@code
- * RuntimeException}.<p>
+ * because one can not assume that the client is the one handling the
+ * transaction demarcation. If he do or otherwise has an interest in knowing if
+ * the transaction rolled back, then the client can simply catch a {@code
+ * RuntimeException} because all those rollback the exception.<p>
  * 
  * Next, I'll dig through the specifications a bit to see what they have to say
  * before reaching an almighty final verdict.<p>
@@ -238,7 +238,7 @@ import org.junit.runner.RunWith;
  * "application exceptions" that may or may not mark a transaction for rollback.
  * Application exceptions are all checked exceptions or unchecked exceptions
  * annotated {@code @ApplicationException}. These are thrown to the client
- * as-is and by default they do not roll back the transaction nor do application
+ * as-is and by default they do not rollback the transaction nor do application
  * exceptions invalidate the bean instance which is otherwise the case (except
  * for {@code @Singleton}).<p>
  * 
@@ -259,8 +259,8 @@ import org.junit.runner.RunWith;
  * "poison" exception type to the client, letting him know that continuing the
  * transaction is fruitless. I find that adding such poison pills to the mix
  * only increase complexity. The client has a myriad of ways to find out whether
- * or not the transaction has been set to roll back. In case of
- * {@code @Transactional}, all unchecked exceptions roll back the transaction so
+ * or not the transaction has been set to rollback. In case of
+ * {@code @Transactional}, all unchecked exceptions rollback the transaction so
  * that's pritty obvious and easy to catch.<p>
  * 
  * GlassFish has erased all traces of the original cause, and that is not a good
@@ -359,7 +359,7 @@ public class ExceptionCauseTest
      * a javax.transaction.RollbackException that in turn has no cause. The
      * thrown NPE is completely lost; not even logged.<p>
      * 
-     * Both servers roll back the transaction.
+     * Both servers rollback the transaction.
      */
     @Test(expected = NullPointerException.class)
     public void throwNPE_txNotInherited_noThrowsClause() {
@@ -383,7 +383,7 @@ public class ExceptionCauseTest
      * a javax.transaction.RollbackException that in turn has no cause. The
      * thrown NPE is completely lost; not even logged.<p>
      * 
-     * Both servers roll back the transaction.
+     * Both servers rollback the transaction.
      */
     @Test(expected = NullPointerException.class)
     public void throwNPE_txNotInherited_hasThrowsClause() {
@@ -400,7 +400,7 @@ public class ExceptionCauseTest
      * Make target bean inherit a transaction from client and then throw a
      * NullPointerException from a method that doesn't have a throws clause.<p>
      * 
-     * Both servers throw NullPointerException and roll back the transaction.
+     * Both servers throw NullPointerException and rollback the transaction.
      */
     @Test(expected = NullPointerException.class)
     public void throwNPE_txInherited_noThrowsClause() {
@@ -423,7 +423,7 @@ public class ExceptionCauseTest
      * NullPointerException from a method that declares the exception in its
      * throws clause.
      * 
-     * Both servers throw NullPointerException and roll back the transaction.
+     * Both servers throw NullPointerException and rollback the transaction.
      */
     @Test(expected = NullPointerException.class)
     public void throwNPE_txInherited_hasThrowsClause() {
@@ -444,7 +444,7 @@ public class ExceptionCauseTest
     /**
      * Make target bean start a transaction and then throw an IOException.<p>
      * 
-     * Both servers throw IOException and does not roll back the transaction.
+     * Both servers throw IOException and does not rollback the transaction.
      * 
      * @throws Exception should be IOException
      */
@@ -463,7 +463,7 @@ public class ExceptionCauseTest
      * Make target bean inherit a transaction from client and then throw an
      * IOException.<p>
      * 
-     * Both servers throw IOException and does not roll back the transaction.
+     * Both servers throw IOException and does not rollback the transaction.
      * 
      * @throws Exception should be IOException
      */
