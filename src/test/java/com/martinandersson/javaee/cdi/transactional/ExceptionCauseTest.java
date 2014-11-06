@@ -272,7 +272,7 @@ import org.junit.runner.RunWith;
  * 
  * Hence, I think GlassFish should behave just like GlassFish otherwise do and
  * just like WildFly always do: throw the original cause. Removing the trace of
- * the cause and throwing the types currently thrown is hard to motivate.
+ * the cause and throwing the types currently thrown is hard to motivate.<p>
  * 
  * 
  * 
@@ -336,14 +336,28 @@ public class ExceptionCauseTest
      *  -------
      */
     
+    
+    
+    /*
+     * TODO: Current "conclusion" is that inheriting a transaction from client
+     *       code is the solution for GlassFish. I think the problem really is
+     *       whenever GlassFish must start a new transaction in combination of
+     *       the bean throwing a RuntimeException. Thus, a test needs to be
+     *       added that do invoke the bean from a transactional context, but the
+     *       bean method has transactional attribute TxType.REQUIRES_NEW.
+     */
+    
+    
+    
     /**
      * Make target bean start a transaction and then throw a
      * NullPointerException from a method that doesn't have a throws clause.<p>
      * 
-     * WildFly: Client see java.lang.NullPointerException.<br>
-     * GlassFish: Client see javax.transaction.TransactionalException and the
-     * thrown NPE is lost; not set as cause of thrown exception and not even
-     * logged.<p>
+     * WildFly: Client see java.lang.NullPointerException.<p>
+     * 
+     * GlassFish: Client see javax.transaction.TransactionalException caused by
+     * a javax.transaction.RollbackException that in turn has no cause. The
+     * thrown NPE is completely lost; not even logged.<p>
      * 
      * Both servers roll back the transaction.
      */
@@ -363,10 +377,11 @@ public class ExceptionCauseTest
      * NullPointerException from a method that declares the exception in its
      * throws clause.<p>
      * 
-     * WildFly: Client see java.lang.NullPointerException.<br>
-     * GlassFish: Client see javax.transaction.TransactionalException and the
-     * thrown NPE is lost; not set as cause of thrown exception and not even
-     * logged.<p>
+     * WildFly: Client see java.lang.NullPointerException.<p>
+     * 
+     * GlassFish: Client see javax.transaction.TransactionalException caused by
+     * a javax.transaction.RollbackException that in turn has no cause. The
+     * thrown NPE is completely lost; not even logged.<p>
      * 
      * Both servers roll back the transaction.
      */
