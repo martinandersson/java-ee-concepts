@@ -312,7 +312,10 @@ public class ExceptionCauseTest
     
     @After
     public void __destroy() {
-        CDI.current().destroy(testee);
+        if (testee != null) {
+            CDI.current().destroy(testee);
+            testee = null;
+        }
     }
     
     
