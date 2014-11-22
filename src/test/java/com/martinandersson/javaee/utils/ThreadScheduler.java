@@ -430,6 +430,17 @@ public final class ThreadScheduler
             // No more stages for anyone: client's call to scheduler.run() return.
         };
         
+        /*
+         * First block, or scene, of the T1 stage will run until yielder.yield().
+         * T1's thread goes to sleep and T2 stage is executed using another
+         * thread, until T2 call yielder.yield(). Then, T1's thread wakeup and
+         * do one print to console before thread death. Then, T2's thread is
+         * awakened and print one line to the console before he die. Finally,
+         * control is returned to the client's thread.
+         * 
+         * No stage is ever executed at the same time another stage is, and each
+         * stage has his own dedicated worker thread assigned to him.
+         */
         scheduler.enqueue(T1, T2)
                  .run()
                  .reset();
