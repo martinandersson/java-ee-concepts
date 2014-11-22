@@ -474,13 +474,14 @@ public final class ThreadScheduler
         
         
         
-        // SAFE TO ENQUE SAME STAGE MANY TIMES, EXCEPTIONS IMMIDATELY PROPAGATE, REMAINING STAGES NOT EXECUTED
-        // ---------------------------------------------------------------------------------------------------
+        // 1) SAFE TO ENQUE SAME STAGE MANY TIMES, 2) EXCEPTIONS IMMIDATELY PROPAGATE AND REMAINING STAGES NOT EXECUTED
+        // ------------------------------------------------------------------------------------------------------------
         out.println();
         
         /*
-         * "Atomic" is not needed here. Stages are executed serially. However, I
-         * prefer a clean API over nighthacks such as "int[] value = {0}".
+         * "Atomic" is not needed here as stages execute serially, value need
+         * only be effectively final. However, I prefer a clean API over
+         * nighthacks such as "int[] value = {0}".
          */
         AtomicInteger value = new AtomicInteger(2);
         
@@ -512,6 +513,8 @@ public final class ThreadScheduler
         
         Consumer<Yielder> helloWorld = yielder -> {
             out.println("Hello World!");
+            
+            // Client's thread is having a coffee at row 524, let's wake him up!
             client.interrupt();
         };
         
