@@ -285,6 +285,8 @@ import org.junit.runner.RunWith;
  * <h4>Note 3</h4>
  * See EJB 3.2, table 7 in section "9.3.1 Exceptions from
  * a Session Bean's Business Interface Methods and No-Interface View Methods".
+ * Also see {@linkplain
+ * com.martinandersson.javaee.ejb.exceptions.EJBTransactionRolledbackExceptionTest}.
  * 
  * 
  * 
