@@ -217,8 +217,12 @@
  * can further be synchronized or unsynchronized and use two different flush
  * modes. Yaaay =)<p>
  * 
- * These settings are for niche applications only and not further described in
- * this document. If you want to know more, head over to the test files
+ * Note that context synchronization with a transaction is also called
+ * <i>joining</> the transaction.<p>
+ * 
+ * Synchronization type and flush mode are for niche applications only and not
+ * further described in this document. If you want to know more, head over to
+ * the test files
  * {@linkplain com.martinandersson.javaee.jpa.entitymanagers.misc.QueryingForEntitiesTest QueryingForEntitiesTest}
  * and
  * {@linkplain com.martinandersson.javaee.jpa.entitymanagers.misc.SynchronizationTest SynchronizationTest}.
@@ -263,6 +267,36 @@
  * transactions at all. All entity managers support issuing SELECT statements
  * despite not being in an active transaction. See
  * {@linkplain com.martinandersson.javaee.jpa.entitymanagers.misc.QueryingForEntitiesTest QueryingForEntitiesTest}.<p>
+ * 
+ * 
+ * 
+ * <h2>On transaction failure</h2>
+ * 
+ * Section "3.3.3 Transaction Rollback":
+ * 
+ * <pre>{@code
+ * 
+ *     For both transaction-scoped persistence contexts and for extended
+ *     persistence contexts that are joined to the current transaction,
+ *     transaction rollback causes all pre-existing managed instances and
+ *     removed instances to become detached. The instances' state will be the
+ *     state of the instances at the point at which the transaction was rolled
+ *     back. Transaction rollback typically causes the persistence context to be
+ *     in an inconsistent state at the point of rollback. In particular, the
+ *     state of version attributes and generated state (e.g., generated primary
+ *     keys) may be inconsistent. Instances that were formerly managed by the
+ *     persistence context (including new instances that were made persistent in
+ *     that transaction) may therefore not be reusable in the same manner as
+ *     other detached objects—for example, they may fail when passed to the
+ *     merge operation.
+ * 
+ *     NOTE: Because a transaction-scoped persistence context’s lifetime is
+ *     scoped to a transaction regardless of whether it is joined to that
+ *     transaction, the container closes the persistence context upon
+ *     transaction rollback. However, an extended persistence context that is
+ *     not joined to a transaction is unaffected by transaction rollback.
+ * 
+ * }</pre>
  * 
  * 
  * 
