@@ -147,7 +147,10 @@ public final class Deployments
      * WIll build a "POJO" WAR file that optionally include the provided classes
      * and all classes found in the packages that the classes belong to.
      * Therefore, it is usually only necessary to provide one such
-     * "anchor"-class to include.
+     * "anchor"-class to include.<p>
+     * 
+     * This method also include the package friends of the provided {@code
+     * testClass}.
      * 
      * @param testClass calling test class
      * @param include classes to include, may be none
@@ -156,6 +159,8 @@ public final class Deployments
      */
     public static WebArchive buildWARWithPackageFriends(Class<?> testClass, Class<?>... include) {
         WebArchive war = createWAR(testClass);
+        
+        war.addPackage(testClass.getPackage());
         
         Stream.of(include)
                 .map(Class::getPackage)
