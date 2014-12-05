@@ -280,9 +280,20 @@ public class OrphanRemovalTest
      * GlassFish pass this test. WildFly/Hibernate don't. WildFly pass
      * <strong>only if</strong> the relationship of {@code Owner#orphans} is
      * also marked {@code CascadeType.ALL} or {@code CascadeType.PERSIST} (!).
-     * Setting cascade to {@code CascadeType.REMOVE} does not help.
+     * Setting cascade to {@code CascadeType.REMOVE} does not help.<p>
      * 
-     * TODO: File bug.
+     * Related Hibernate bugs:
+     * <pre>{@code
+     * 
+     *     https://hibernate.atlassian.net/browse/HHH-6709
+     *     https://hibernate.atlassian.net/browse/HHH-6037
+     * }</pre>
+     * 
+     * Also see:
+     * <pre>{@code
+     * 
+     *     http://stackoverflow.com/q/24579374/1268003
+     * }</pre>
      */
     @Test
     public void removeFromRelationshipWithOrphanRemoval_entityAlsoRemoved() {
