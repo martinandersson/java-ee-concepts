@@ -48,6 +48,16 @@ public class ClientServerTest
 {
     private static final Logger LOGGER = Logger.getLogger(ClientServerTest.class.getName());
     
+    @Deployment
+    private static WebArchive buildDeployment() {
+        WebArchive war = ShrinkWrap.create(WebArchive.class, ClientServerTest.class.getSimpleName() + ".war");
+        war.addClasses(HelloWorldEJB.class, ServerAPI.class);
+        
+        LOGGER.info(() -> war.toString(true).replace("\n", "\n\t"));
+        
+        return war;
+    }    
+    
     
     
     /*
@@ -62,16 +72,7 @@ public class ClientServerTest
     @EJB
     HelloWorldEJB helloWorldEJB;
     
-    @Deployment
-    private static WebArchive buildDeployment()
-    {
-        WebArchive war = ShrinkWrap.create(WebArchive.class, ClientServerTest.class.getSimpleName() + ".war");
-        war.addClasses(HelloWorldEJB.class, ServerAPI.class);
-        
-        LOGGER.info(() -> war.toString(true).replace("\n", "\n\t"));
-        
-        return war;
-    }
+
     
     
     
@@ -121,8 +122,7 @@ public class ClientServerTest
      */
     @Test
     @InSequence(1)
-    public void server_assertZeroRequests()
-    {
+    public void server_assertZeroRequests() {
         // Is executed on the Server in another JVM:
         assertEquals("Number of HTTP requests", 0, ServerAPI.getRequestCount());
     }
@@ -139,8 +139,7 @@ public class ClientServerTest
     @Test
     @RunAsClient // <-- Have you noticed?
     @InSequence(2)
-    public void client_makeRequest(@ArquillianResource URL url) throws IOException
-    {
+    public void client_makeRequest(@ArquillianResource URL url) throws IOException {
         // Is executed in the original Arquillian JVM, acting like a client.
         
         LOGGER.info(() -> "Deployed application URL: " + url);
@@ -171,8 +170,7 @@ public class ClientServerTest
      */
     @Test
     @InSequence(3)
-    public void server_assertOneRequest()
-    {
+    public void server_assertOneRequest() {
         // Is executed on the Server in another JVM:
         
         assertEquals("Number of HTTP requests", 1, ServerAPI.getRequestCount());
@@ -223,8 +221,7 @@ public class ClientServerTest
      * Before using this method, move it to
      * {@linkplain com.martinandersson.javaee.utils.HttpRequests}.
      */
-    private String[] makeGETRequest(URL url, String... parameters) throws IOException
-    {
+    private String[] makeGETRequest(URL url, String... parameters) throws IOException {
         final int    port  = url.getPort();
         final String host  = url.getHost(),
                      path  = url.getPath(),
@@ -274,8 +271,7 @@ public class ClientServerTest
      * 
      * @return mashed and escaped parameters
      */
-    private String escape(String name, String value)
-    {
+    private String escape(String name, String value) {
         final String charset = StandardCharsets.UTF_8.name();
         
         try {

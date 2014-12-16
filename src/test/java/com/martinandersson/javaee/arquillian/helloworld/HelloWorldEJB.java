@@ -31,8 +31,7 @@ public class HelloWorldEJB
      * 
      * @return {@code what.toUpperCase()}
      */
-    public String toUpperCase(String what)
-    {
+    public String toUpperCase(String what) {
         /*
          * This is a contrived example. Serious code, for example making a
          * username lower- or uppercased before transmission to a database,

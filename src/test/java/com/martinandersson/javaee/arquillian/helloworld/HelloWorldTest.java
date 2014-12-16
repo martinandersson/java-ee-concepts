@@ -216,23 +216,8 @@ public class HelloWorldTest
 {
     private static final Logger LOGGER = Logger.getLogger(HelloWorldTest.class.getName());
     
-    
-    
-    /*
-     *  --------------
-     * | DEPENDENCIES |
-     *  --------------
-     */
-    
-    @Rule
-    public TestName name = new TestName();
-    
-    @EJB
-    HelloWorldEJB helloWorldEJB;
-    
     @Deployment
-    private static JavaArchive buildDeployment()
-    {
+    private static JavaArchive buildDeployment() {
         /*
          * If you don't provide a name in the next statement and only provide
          * the archive class file, then a random name will be generated. Given
@@ -251,6 +236,22 @@ public class HelloWorldTest
         
         return jar;
     }
+    
+    
+    /*
+     *  --------------
+     * | DEPENDENCIES |
+     *  --------------
+     */
+    
+    @Rule
+    public TestName name = new TestName();
+    
+    @EJB
+    HelloWorldEJB helloWorldEJB;
+    
+    
+
     
     
     
@@ -296,8 +297,7 @@ public class HelloWorldTest
      * This test is executed on the Server.
      */
     @Test
-    public void helloWorldEJB_toUpperCase() throws Exception
-    {
+    public void helloWorldEJB_toUpperCase() throws Exception {
         LOGGER.info("Where is this printed? In the server log!");
         
         /*

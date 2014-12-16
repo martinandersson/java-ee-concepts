@@ -63,8 +63,7 @@ public class ServerAPI extends HttpServlet
     }
     
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException
-    {
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         final String world = req.getParameter("hello");
         
         if (world == null) {
@@ -76,8 +75,7 @@ public class ServerAPI extends HttpServlet
         }
     }
     
-    private void reply(String message, int status, HttpServletResponse resp) throws IOException
-    {
+    private void reply(String message, int status, HttpServletResponse resp) throws IOException {
         /*
          * If SC_BAD_REQUEST, one would perhaps like to use sendError() instead
          * of setStatus(). But that would allow the server to also output a
