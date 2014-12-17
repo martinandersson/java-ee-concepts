@@ -6,7 +6,8 @@ package com.martinandersson.javaee.cdi.qualifiers.lib;
  * 
  * @author Martin Andersson (webmaster at martinandersson.com)
  */
-public interface Caloric {
+public interface Caloric
+{
     /**
      * Returns the number of calories this {@code Caloric} entity stores.
      * 

@@ -46,7 +46,6 @@ public class QualifierDriver extends HttpServlet
     
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        
         Report<Class<? extends Caloric>> report = new Report(
                 water.getClass(), broccoli.getClass(), meat.getClass());
         
@@ -57,7 +56,6 @@ public class QualifierDriver extends HttpServlet
     
     
     static class Report<T extends Class<? extends Caloric>> implements Serializable {
-        
         final T defaultType, healthyType, unhealthyType;
         
         Report(T defaultType, T healthyType, T unhealthyType) {

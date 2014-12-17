@@ -10,8 +10,8 @@ package com.martinandersson.javaee.cdi.qualifiers.lib;
  * @author Martin Andersson (webmaster at martinandersson.com)
  */
 @Unhealthy
-public class Meat implements Caloric {
-    
+public class Meat implements Caloric
+{    
     /**
      * Any piece of meat has exactly 1 000 calories.
      * 

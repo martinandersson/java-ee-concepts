@@ -25,8 +25,8 @@ import org.junit.runner.RunWith;
  * @author Martin Andersson (webmaster at martinandersson.com)
  */
 @RunWith(Arquillian.class)
-public class QualifierTest {
-    
+public class QualifierTest
+{    
     @Deployment
     public static WebArchive buildDeployment() {
         return Deployments.buildCDIBeanArchive(

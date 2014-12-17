@@ -8,8 +8,8 @@ package com.martinandersson.javaee.cdi.qualifiers.lib;
  * @author Martin Andersson (webmaster at martinandersson.com)
  */
 @Healthy
-public class Broccoli implements Caloric {
-    
+public class Broccoli implements Caloric
+{    
     /**
      * A broccoli has exactly 2 calories.
      * 

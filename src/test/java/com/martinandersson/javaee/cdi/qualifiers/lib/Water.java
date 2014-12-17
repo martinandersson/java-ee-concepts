@@ -7,8 +7,8 @@ package com.martinandersson.javaee.cdi.qualifiers.lib;
  * @author Martin Andersson (webmaster at martinandersson.com)
  */
 // Implicitly: @javax.enterprise.inject.Default
-public class Water implements Caloric {
-
+public class Water implements Caloric
+{
     /**
      * Water has zero calories.
      * 
