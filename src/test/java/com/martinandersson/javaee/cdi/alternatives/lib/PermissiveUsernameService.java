@@ -23,7 +23,7 @@ import javax.enterprise.inject.Alternative;
  * @author Martin Andersson (webmaster at martinandersson.com)
  */
 @Alternative
-@Priority(1)
+@Priority(1) // TODO: Add comment whether 1 is high or low.
 public class PermissiveUsernameService implements UsernameService
 {
     /**
@@ -31,6 +31,6 @@ public class PermissiveUsernameService implements UsernameService
      */
     @Override
     public boolean isReserved(String username) {
-        return true;
+        return false;
     }   
 }

@@ -7,7 +7,8 @@ package com.martinandersson.javaee.cdi.alternatives.lib;
  * 
  * @author Martin Andersson (webmaster at martinandersson.com)
  */
-public interface UsernameService {
+public interface UsernameService
+{
     /**
      * Returns whether or not the provided username is "reserved".<p>
      * 
