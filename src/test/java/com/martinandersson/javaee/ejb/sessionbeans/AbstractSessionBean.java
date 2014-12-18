@@ -73,8 +73,8 @@ import javax.annotation.PreDestroy;
  * 
  * @author Martin Andersson (webmaster at martinandersson.com)
  */
-public abstract class AbstractSessionBean {
-    
+public abstract class AbstractSessionBean
+{    
     private static final Logger LOGGER = Logger.getLogger(AbstractSessionBean.class.getName());
     
     private final int ID = System.identityHashCode(this);

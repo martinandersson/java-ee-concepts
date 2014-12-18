@@ -178,7 +178,7 @@ public class SynchronizationTest
      * 
      * }</pre>
      * 
-     * Both GlassFish 4.1 and WildFly 8.1.0 fail this test.
+     * Both GlassFish 4.1, WildFly 8.1.0 and WildFly 8.2.0 fail this test.
      * TODO: Report bugs.
      * 
      * @throws Throwable if all goes well

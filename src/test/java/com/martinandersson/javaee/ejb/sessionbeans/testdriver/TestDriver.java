@@ -27,7 +27,7 @@ import javax.servlet.http.HttpServletResponse;
 
 /**
  * Executes a particular {@code Operation} against session bean references of
- * {@code EJBType}.
+ * {@code EJBType}.<p>
  * 
  * The settings (Operation and EJBType), is passed to the Servlet in the POST
  * body as an {@code ExecutionSettings} object.
@@ -56,7 +56,6 @@ public class TestDriver extends HttpServlet
     
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        
         ObjectInputStream in = new ObjectInputStream(req.getInputStream());
         
         final ExecutionSettings settings;

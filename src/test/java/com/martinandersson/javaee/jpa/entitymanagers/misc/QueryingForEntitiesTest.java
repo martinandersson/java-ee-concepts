@@ -272,7 +272,7 @@ public class QueryingForEntitiesTest
      * entity or at least one entity-like thing that has a traversable state.<p>
      * 
      * GlassFish 4.1: pass.<br>
-     * WildFly 8.1.0: fail.<p>
+     * WildFly 8.1.0 and 8.2.0: fail.<p>
      * 
      * This result is opposite of
      * {@linkplain #findSingle_noTx_usingGetReference() findSingle_noTx_usingGetReference}.<p>
