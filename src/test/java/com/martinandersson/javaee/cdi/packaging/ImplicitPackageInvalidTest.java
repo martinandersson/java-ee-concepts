@@ -2,6 +2,9 @@ package com.martinandersson.javaee.cdi.packaging;
 
 import com.martinandersson.javaee.cdi.packaging.lib.CalculatorUnAnnotated;
 import com.martinandersson.javaee.utils.Deployments;
+import java.util.logging.Logger;
+import javax.annotation.PostConstruct;
+import javax.ejb.Startup;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.jboss.arquillian.container.test.api.Deployment;
@@ -43,7 +46,8 @@ import org.junit.runner.RunWith;
  * <h3>The Arquillian @ShouldThrowException dilemma</h3>
  * 
  * Inspecting the server logs after running this test reveal that both WildFly
- * and GlassFish throw this exception:
+ * 8.1.0 and GlassFish 4.1 throw this exception (WildFly 8.2.0 won't pass this
+ * test):
  * 
  * <pre>{@code
  *     org.jboss.weld.exceptions.DeploymentException.class
@@ -65,12 +69,20 @@ import org.junit.runner.RunWith;
  *     Cannot deploy: ImplicitPackageInvalidTest.war
  * }</pre>
  * 
- * So the problem with the test according to Arquillian is that the test which
- * is not supposed to deploy didn't deploy.<p>
+ * So the problem with the test in this case, according to Arquillian, is that
+ * the test which is not supposed to deploy didn't deploy (!).<p>
  * 
  * With that said, because further exception class specification display an
  * Arquillian related problem, having a naked {@code @ShouldThrowException}
  * will do since we know why and the why is exactly as expected.<p>
+ * 
+ * 
+ * 
+ * <h3>Results</h3>
+ * 
+ * Work on GlassFish 4.1 and WildFly 8.1.0, but not WildFly 8.2.0.<p>
+ * 
+ * TODO: Report a bug.
  * 
  * 
  * 
@@ -88,10 +100,25 @@ public class ImplicitPackageInvalidTest
     }
     
     @Test // <-- implicitly @RunAsClient given that @ShouldThrowException is put on @Deployment
-    public void implicitBeanArchiveRequireExplicitBeanAnnotations() { }
+    public void implicitBeanArchiveRequireExplicitBeanAnnotations() {
+        // Empty
+    }
 }
 
 @Singleton
+@Startup
 class ForceBeanDiscovery {
     @Inject CalculatorUnAnnotated unAnnotated;
+    
+    @PostConstruct
+    public void helloWorld() {
+        /*
+         * GlassFish 4.1 and WildFly 8.1.0 pass this test even without the
+         * @Startup annotation or this life cycle callback. WildFly 8.2.0 deploy
+         * the archive but won't log this message. Apparently, WildFly 8.2.0
+         * won't discover the ForceBeanDiscovery bean. As far as I can tell,
+         * EJB 3.2 doesn't require an EJB to have public access.
+         */
+        Logger.getLogger(ForceBeanDiscovery.class.getName()).severe("Not supposed to be deployed!");
+    }
 }
