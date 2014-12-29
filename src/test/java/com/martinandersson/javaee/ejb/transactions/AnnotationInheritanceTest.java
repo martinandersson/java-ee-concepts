@@ -237,8 +237,8 @@ public class AnnotationInheritanceTest
     }
     
     /**
-     * Do GlassFish still have problems if it is only the superclass that is
-     * generic? Yes.<p>
+     * Do GlassFish still have problems if it is the superclass that is generic?
+     * Yes.<p>
      * 
      * Base class: @TransactionAttribute(SUPPORTS)<br>
      * Base foo: @TransactionAttribute(MANDATORY)<p>
