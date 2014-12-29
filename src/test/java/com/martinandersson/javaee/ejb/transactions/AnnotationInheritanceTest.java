@@ -68,7 +68,18 @@ import org.junit.runner.RunWith;
  * The quotes are a bit way too complex. But my understanding, and what perhaps
  * is a needed simplification is the following: All annotations put on a
  * supertype apply, as long as the subclass does not redeclare the method. If
- * so, all annotations on the supertype is ignored.
+ * so, all annotations on the supertype is ignored.<p>
+ * 
+ * 
+ * 
+ * <h3>Results</h3>
+ * 
+ * WildFly 8.2.0 pass all tests. GlassFish 4.1 fail bean-test 3, 4 and 7. Bug
+ * filed here:
+ * <pre>{@code
+ * 
+ *     https://java.net/jira/browse/GLASSFISH-21280
+ * }</pre>
  * 
  * 
  * 
