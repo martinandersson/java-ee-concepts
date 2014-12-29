@@ -178,7 +178,7 @@ public class AnnotationInheritanceTest
                 Status.STATUS_ACTIVE, bean3.foo(/* ignored: */ 123));
     }
     
-    /**glass
+    /**
      * As the ultimate proof of the last declared test case, let's make the base
      * class not support transactions at all. GlassFish: call goes through and
      * return Status.STATUS_NO_TRANSACTION.<p>
