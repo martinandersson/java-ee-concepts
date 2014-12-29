@@ -102,6 +102,9 @@ public class AnnotationInheritanceTest
     @EJB
     Derived6 bean6;
     
+    @EJB
+    Derived7 bean7;
+    
     
     
     /**
@@ -164,7 +167,7 @@ public class AnnotationInheritanceTest
                 Status.STATUS_ACTIVE, bean3.foo(/* ignored: */ 123));
     }
     
-    /**
+    /**glass
      * As the ultimate proof of the last declared test case, let's make the base
      * class not support transactions at all. GlassFish: call goes through and
      * return Status.STATUS_NO_TRANSACTION.<p>
@@ -220,5 +223,24 @@ public class AnnotationInheritanceTest
     public void bean6() {
         assertEquals("MANDATORY in base should implicitly be honoured because derived has REQUIRED,",
                 Status.STATUS_ACTIVE, bean6.foo(/* ignored: */ new Object()));
+    }
+    
+    /**
+     * Do GlassFish still have problems if it is only the superclass that is
+     * generic? Yes.<p>
+     * 
+     * Base class: @TransactionAttribute(SUPPORTS)<br>
+     * Base foo: @TransactionAttribute(MANDATORY)<p>
+     * 
+     * Derived class: @TransactionAttribute(SUPPORTS)<br>
+     * Derived foo: @TransactionAttribute(REQUIRED)<p>
+     * 
+     * GF: javax.ejb.EJBTransactionRequiredException, caused by javax.ejb.TransactionRequiredLocalException<br>
+     * WF: pass
+     */
+    @Test
+    public void bean7() {
+        assertEquals("MANDATORY in base should implicitly be honoured because derived has REQUIRED,",
+                Status.STATUS_ACTIVE, bean7.foo(/* ignored: */ 123));
     }
 }
