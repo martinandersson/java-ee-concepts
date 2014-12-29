@@ -149,8 +149,8 @@ public final class Deployments
      * Therefore, it is usually only necessary to provide one such
      * "anchor"-class to include.<p>
      * 
-     * This method also include the package friends of the provided {@code
-     * testClass}.
+     * This method also include package friends of the provided specified
+     * {@code testClass}.
      * 
      * @param testClass calling test class
      * @param include classes to include, may be none

@@ -33,7 +33,7 @@ public class Person
     private Set<String> nicknames;
     
     protected Person() {
-        
+        // Empty
     }
     
     public Person(String... nicknames) {

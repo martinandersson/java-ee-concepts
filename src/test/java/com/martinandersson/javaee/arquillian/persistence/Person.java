@@ -46,7 +46,9 @@ public class Person // note 1
      * No-arg constructor required by JPA. Application code should have no
      * business using this constructor.
      */
-    protected Person() {}
+    protected Person() {
+        // Empty
+    }
     
     public Person(String name) {
         this.name = Objects.requireNonNull(name, "name is null");
