@@ -17,9 +17,15 @@ import org.junit.runner.RunWith;
 
 /**
  * The {@code TransactionSynchronizationRegistry} offer a low-level transaction
- * API "not meant to be used by application programmers". But of course, such
- * statement assume that all servers do what they are supposed to do, which is
- * not always the case.
+ * API "not meant to be used by application programmers".<p>
+ * 
+ * But of course, such a statement assume that all servers do what they are
+ * supposed to do, which is not always the case. The current state of 1) buggy
+ * server software, 2) an insufficient API and 3) the enforcement of programming
+ * models upon others, require the developer to get his hands dirty and use the
+ * registry from time to time.<p>
+ * 
+ * TODO: This "test" is currently very incomplete.
  * 
  * @author Martin Andersson (webmaster at martinandersson.com)
  */
