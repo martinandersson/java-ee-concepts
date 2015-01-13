@@ -297,7 +297,7 @@ public class HelloWorldTest
      * This test is executed on the Server.
      */
     @Test
-    public void helloWorldEJB_toUpperCase() throws Exception {
+    public void helloWorldEJB_toUpperCase() {
         LOGGER.info("Where is this printed? In the server log!");
         
         /*
