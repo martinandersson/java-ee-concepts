@@ -143,7 +143,6 @@ public final class HttpRequests
     public static <T> T sendGetObject(URL url, Class<?> testDriverType, Serializable toSend) {
         Objects.requireNonNull(toSend);
         
-        final URL testDriver; // = new URL(url, testDriverType.getSimpleName());
         final HttpURLConnection conn = openNonPersistentConnection(url, testDriverType);
         
         try {
