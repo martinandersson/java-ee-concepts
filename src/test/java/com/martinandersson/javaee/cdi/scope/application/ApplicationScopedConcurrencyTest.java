@@ -1,4 +1,4 @@
-package com.martinandersson.javaee.cdi.scope.applicationscoped;
+package com.martinandersson.javaee.cdi.scope.application;
 
 import com.martinandersson.javaee.utils.Deployments;
 import com.martinandersson.javaee.utils.PhasedExecutorService;

@@ -1,4 +1,4 @@
-package com.martinandersson.javaee.cdi.scope.applicationscoped;
+package com.martinandersson.javaee.cdi.scope.application;
 
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
