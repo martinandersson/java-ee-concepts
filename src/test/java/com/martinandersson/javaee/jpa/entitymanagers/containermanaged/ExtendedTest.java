@@ -3,14 +3,14 @@ package com.martinandersson.javaee.jpa.entitymanagers.containermanaged;
 import com.martinandersson.javaee.jpa.entitymanagers.AbstractJTAEntityManagerTest;
 import com.martinandersson.javaee.jpa.entitymanagers.EntityManagerExposer;
 import com.martinandersson.javaee.jpa.entitymanagers.lib.ContainerManagedTx;
+import com.martinandersson.javaee.jpa.entitymanagers.lib.Product;
+import com.martinandersson.javaee.jpa.entitymanagers.lib.Products;
 import com.martinandersson.javaee.jpa.entitymanagers.lib.SingletonWithExtended;
 import com.martinandersson.javaee.jpa.entitymanagers.lib.StatefulWithExtended1;
 import com.martinandersson.javaee.jpa.entitymanagers.lib.StatefulWithExtended2;
 import com.martinandersson.javaee.jpa.entitymanagers.lib.StatefulWithExtended3;
 import com.martinandersson.javaee.jpa.entitymanagers.lib.StatelessWithExtended;
 import com.martinandersson.javaee.jpa.entitymanagers.lib.TransactionalWithExtended;
-import com.martinandersson.javaee.jpa.entitymanagers.lib.Product;
-import com.martinandersson.javaee.jpa.entitymanagers.lib.Products;
 import com.martinandersson.javaee.resources.SchemaGenerationStrategy;
 import com.martinandersson.javaee.utils.Deployments;
 import com.martinandersson.javaee.utils.Lookup;
@@ -175,9 +175,6 @@ public class ExtendedTest extends AbstractContainerManagedEntityManagerTest
      * javax.transaction.RollbackException} and no useful information at all can
      * be retrieved from the log.<p>
      * 
-     * Me personally, I would prefer that the application did not deploy at
-     * all.<p>
-     * 
      * <strong>WildFly 8.1.0</strong> is even worse<sup>1</sup> and let our code
      * use the {@code @Transactional} with no apparent limitation. The product
      * will successfully be persisted.<p>
@@ -193,7 +190,10 @@ public class ExtendedTest extends AbstractContainerManagedEntityManagerTest
      * 
      * By "worse", I mean that WildFly clearly brake the specification. Me
      * personally, I see no harm in braking this rule. The contextual CDI bean
-     * is "stateful".
+     * is "stateful". Also see:
+     * <pre>{@code
+     *     https://github.com/javaee-samples/javaee7-samples/issues/238
+     * }</pre>
      * 
      * 
      * 
