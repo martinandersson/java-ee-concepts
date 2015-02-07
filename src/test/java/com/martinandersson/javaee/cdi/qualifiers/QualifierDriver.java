@@ -24,7 +24,7 @@ import javax.servlet.http.HttpServletResponse;
  * Broccoli broccoli}? In software development, we always prefer interface-based
  * programming. The code in this servlet do not depend on a specific
  * implementation. The code is implementation agnostic. What our code do is to
- * declared a semantic dependency of "healthy" and "unhealthy" foods. This
+ * declare a semantic dependency of "healthy" and "unhealthy" foods. This
  * annotation may be used in many different places all over the software system.
  * 
  * @author Martin Andersson (webmaster at martinandersson.com)

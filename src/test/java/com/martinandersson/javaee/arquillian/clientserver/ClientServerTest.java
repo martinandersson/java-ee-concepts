@@ -14,7 +14,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import javax.ejb.EJB;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.RunAsClient;
 import org.jboss.arquillian.junit.Arquillian;
@@ -45,7 +44,7 @@ import org.junit.runner.RunWith;
  */
 @RunWith(Arquillian.class)
 public class ClientServerTest
-{
+{   
     private static final Logger LOGGER = Logger.getLogger(ClientServerTest.class.getName());
     
     @Deployment
@@ -68,11 +67,6 @@ public class ClientServerTest
     
     @Rule
     public TestName name = new TestName();
-    
-    @EJB
-    HelloWorldEJB helloWorldEJB;
-    
-
     
     
     
