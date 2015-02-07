@@ -16,6 +16,7 @@ import java.util.Objects;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import javax.servlet.http.HttpServlet;
 
 /**
  * Procedures for making {@code HTTP/1.1} request to the test server.<p>
@@ -69,7 +70,7 @@ public final class HttpRequests
      * 
      * @return object returned by the test driver
      */
-    public static byte[] getBytes(URL url, Class<?> testDriverType, RequestParameter... parameters) {
+    public static byte[] getBytes(URL url, Class<? extends HttpServlet> testDriverType, RequestParameter... parameters) {
         final URLConnection conn = openNonPersistentConnection(url, testDriverType, parameters);
         
         try (InputStream in = conn.getInputStream()) {
@@ -106,7 +107,7 @@ public final class HttpRequests
      * 
      * @return object returned by the test driver
      */
-    public static <T> T getObject(URL url, Class<?> testDriverType, RequestParameter... parameters) { 
+    public static <T> T getObject(URL url, Class<? extends HttpServlet> testDriverType, RequestParameter... parameters) { 
         final URLConnection conn = openNonPersistentConnection(url, testDriverType, parameters);
         
         try (ObjectInputStream in = new ObjectInputStream(conn.getInputStream());) {
@@ -140,7 +141,7 @@ public final class HttpRequests
      * 
      * @return object returned by the test driver
      */
-    public static <T> T sendGetObject(URL url, Class<?> testDriverType, Serializable toSend) {
+    public static <T> T sendGetObject(URL url, Class<? extends HttpServlet> testDriverType, Serializable toSend) {
         Objects.requireNonNull(toSend);
         
         final HttpURLConnection conn = openNonPersistentConnection(url, testDriverType);
@@ -149,7 +150,7 @@ public final class HttpRequests
             conn.setRequestMethod("POST");
         }
         catch (ProtocolException e) {
-            throw new AssertionError("POST is supported and yes, URLConnection is known to have a bad API design.");
+            throw new AssertionError("POST is supported and yes, URLConnection is known to have a bad API design.", e);
         }
         
         conn.setDoOutput(true);
@@ -232,7 +233,7 @@ public final class HttpRequests
      * 
      * @throws IllegalArgumentException if provided URL is not a HTTP URI
      */
-    private static HttpURLConnection openNonPersistentConnection(URL url, Class<?> testDriverType, RequestParameter... parameters) {
+    private static HttpURLConnection openNonPersistentConnection(URL url, Class<? extends HttpServlet> testDriverType, RequestParameter... parameters) {
         try {
             String query = RequestParameter.buildQuery(parameters);
             URL testDriver = new URL(url, testDriverType.getSimpleName() + query);
