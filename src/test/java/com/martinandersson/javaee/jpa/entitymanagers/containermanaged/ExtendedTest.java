@@ -12,7 +12,7 @@ import com.martinandersson.javaee.jpa.entitymanagers.lib.StatefulWithExtended3;
 import com.martinandersson.javaee.jpa.entitymanagers.lib.StatelessWithExtended;
 import com.martinandersson.javaee.jpa.entitymanagers.lib.TransactionalWithExtended;
 import com.martinandersson.javaee.resources.SchemaGenerationStrategy;
-import com.martinandersson.javaee.utils.Deployments;
+import com.martinandersson.javaee.utils.DeploymentBuilder;
 import com.martinandersson.javaee.utils.Lookup;
 import java.util.logging.Logger;
 import javax.ejb.EJB;
@@ -105,21 +105,22 @@ public class ExtendedTest extends AbstractContainerManagedEntityManagerTest
     
     @Deployment
     private static Archive<?> buildDeployment() {
-        return Deployments.buildPersistenceArchive(SchemaGenerationStrategy.DROP_CREATE,
-                ExtendedTest.class,
-                AbstractContainerManagedEntityManagerTest.class,
-                AbstractJTAEntityManagerTest.class,
-                EntityManagerExposer.class,
-                Product.class,
-                Products.class,
-                Lookup.class,
-                TransactionalWithExtended.class,
-                StatelessWithExtended.class,
-                SingletonWithExtended.class,
-                StatefulWithExtended1.class,
-                StatefulWithExtended2.class,
-                StatefulWithExtended3.class,
-                ContainerManagedTx.class);
+        return new DeploymentBuilder(ExtendedTest.class)
+                .addPersistenceXMLFile(SchemaGenerationStrategy.DROP_CREATE)
+                .add(AbstractContainerManagedEntityManagerTest.class,
+                     AbstractJTAEntityManagerTest.class,
+                     EntityManagerExposer.class,
+                     Product.class,
+                     Products.class,
+                     Lookup.class,
+                     TransactionalWithExtended.class,
+                     StatelessWithExtended.class,
+                     SingletonWithExtended.class,
+                     StatefulWithExtended1.class,
+                     StatefulWithExtended2.class,
+                     StatefulWithExtended3.class,
+                     ContainerManagedTx.class)
+                .build();
     }
     
     

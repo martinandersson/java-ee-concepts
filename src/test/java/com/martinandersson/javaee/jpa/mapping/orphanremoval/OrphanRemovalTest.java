@@ -1,7 +1,7 @@
 package com.martinandersson.javaee.jpa.mapping.orphanremoval;
 
 import com.martinandersson.javaee.resources.SchemaGenerationStrategy;
-import com.martinandersson.javaee.utils.Deployments;
+import com.martinandersson.javaee.utils.DeploymentBuilder;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.logging.Logger;
 import javax.ejb.EJB;
@@ -38,14 +38,10 @@ public class OrphanRemovalTest
 {
     @Deployment
     private static Archive<?> buildDeployment() {
-        return Deployments.buildPersistenceArchive(SchemaGenerationStrategy.UPDATE,
-                OrphanRemovalTest.class,
-                Repository.class,
-                Owner.class,
-                AbstractId.class,
-                CascadeNone.class,
-                CascadeRemove.class,
-                OrphanRemoval.class);
+        return new DeploymentBuilder(OrphanRemovalTest.class)
+                .addPersistenceXMLFile(SchemaGenerationStrategy.UPDATE)
+                .addTestPackage()
+                .build();
     }
     
     

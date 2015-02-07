@@ -1,9 +1,9 @@
 package com.martinandersson.javaee.cdi.specializes;
 
-import com.martinandersson.javaee.cdi.specializes.lib.StupidCalculator;
-import com.martinandersson.javaee.cdi.specializes.lib.SmartCalculator;
 import com.martinandersson.javaee.cdi.specializes.SpecializesDriver.Report;
-import com.martinandersson.javaee.utils.Deployments;
+import com.martinandersson.javaee.cdi.specializes.lib.SmartCalculator;
+import com.martinandersson.javaee.cdi.specializes.lib.StupidCalculator;
+import com.martinandersson.javaee.utils.DeploymentBuilder;
 import com.martinandersson.javaee.utils.HttpRequests;
 import java.net.URL;
 import org.jboss.arquillian.container.test.api.Deployment;
@@ -59,7 +59,7 @@ import org.junit.runner.RunWith;
  * 
  * <strong>However</strong>, WELD do call the observer methods of our replaced
  * bean, both static and non-static. So currently, the test
- * "stupidCalculatorObserversNotCalled" in this class fail in both GlassFish and
+ * "stupidCalculatorObserversNotCalled" in this class fail on both GlassFish and
  * WildFly.
  * 
  * Bug filed <a href="https://issues.jboss.org/browse/WELD-1741">here</a>.
@@ -73,11 +73,12 @@ public class SpecializesTest
 {
     @Deployment
     public static WebArchive buildDeployment() {
-        return Deployments.buildCDIBeanArchive(
-                SpecializesTest.class,
-                SpecializesDriver.class,
-                StupidCalculator.class,
-                SmartCalculator.class);
+        return new DeploymentBuilder(SpecializesTest.class)
+                .addEmptyBeansXMLFile()
+                .add(SpecializesDriver.class,
+                     StupidCalculator.class,
+                     SmartCalculator.class)
+                .build();
     }
     
     static Report report; // = initialized in __callDriver().

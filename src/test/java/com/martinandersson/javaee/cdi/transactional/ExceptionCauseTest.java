@@ -1,6 +1,6 @@
 package com.martinandersson.javaee.cdi.transactional;
 
-import com.martinandersson.javaee.utils.Deployments;
+import com.martinandersson.javaee.utils.DeploymentBuilder;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -299,9 +299,10 @@ public class ExceptionCauseTest
     
     @Deployment
     private static Archive<?> buildDeployment() {
-        return Deployments.buildCDIBeanArchive(
-                ExceptionCauseTest.class,
-                CrashingBean.class);
+        return new DeploymentBuilder(ExceptionCauseTest.class)
+                .addEmptyBeansXMLFile()
+                .add(CrashingBean.class)
+                .build();
     }
     
     @Rule

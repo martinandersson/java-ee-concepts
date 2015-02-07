@@ -7,7 +7,7 @@ import com.martinandersson.javaee.jpa.entitymanagers.lib.Product;
 import com.martinandersson.javaee.jpa.entitymanagers.lib.Products;
 import com.martinandersson.javaee.jpa.entitymanagers.lib.StatefulWithExtended1;
 import com.martinandersson.javaee.resources.SchemaGenerationStrategy;
-import com.martinandersson.javaee.utils.Deployments;
+import com.martinandersson.javaee.utils.DeploymentBuilder;
 import com.martinandersson.javaee.utils.Lookup;
 import java.util.function.Function;
 import javax.inject.Inject;
@@ -137,16 +137,16 @@ public class JTATest extends AbstractJTAEntityManagerTest
 {
     @Deployment
     private static Archive<?> buildDeployment() {
-        return Deployments.buildPersistenceArchive(
-                SchemaGenerationStrategy.UPDATE,
-                JTATest.class,
-                AbstractJTAEntityManagerTest.class,
-                EntityManagerExposer.class,
-                Lookup.class,
-                Product.class,
-                Products.class,
-                ContainerManagedTx.class,
-                StatefulWithExtended1.class);
+        return new DeploymentBuilder(JTATest.class)
+                .addPersistenceXMLFile(SchemaGenerationStrategy.UPDATE)
+                .add(AbstractJTAEntityManagerTest.class,
+                     EntityManagerExposer.class,
+                     Lookup.class,
+                     Product.class,
+                     Products.class,
+                     ContainerManagedTx.class,
+                     StatefulWithExtended1.class)
+                .build();
     }
     
     

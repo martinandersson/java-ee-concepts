@@ -3,7 +3,7 @@ package com.martinandersson.javaee.cdi.specializes;
 import com.martinandersson.javaee.cdi.specializes.lib.DefaultUserSettings;
 import com.martinandersson.javaee.cdi.specializes.lib.SpecializedUserSettings;
 import com.martinandersson.javaee.cdi.specializes.lib.UserSettings;
-import com.martinandersson.javaee.utils.Deployments;
+import com.martinandersson.javaee.utils.DeploymentBuilder;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.ShouldThrowException;
 import org.jboss.arquillian.junit.Arquillian;
@@ -49,11 +49,12 @@ public class UndeployableSpecializationTest {
     @Deployment
     @ShouldThrowException
     public static WebArchive buildDeployment() {
-        return Deployments.buildCDIBeanArchive(
-                UndeployableSpecializationTest.class,
-                UserSettings.class,
-                DefaultUserSettings.class,
-                SpecializedUserSettings.class);
+        return new DeploymentBuilder(UndeployableSpecializationTest.class)
+                .addEmptyBeansXMLFile()
+                .add(UserSettings.class,
+                     DefaultUserSettings.class,
+                     SpecializedUserSettings.class)
+                .build();
     }
     
     @Test

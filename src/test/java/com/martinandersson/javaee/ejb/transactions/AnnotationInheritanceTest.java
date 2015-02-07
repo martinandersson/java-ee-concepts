@@ -1,6 +1,6 @@
 package com.martinandersson.javaee.ejb.transactions;
 
-import com.martinandersson.javaee.utils.Deployments;
+import com.martinandersson.javaee.utils.DeploymentBuilder;
 import javax.ejb.EJB;
 import javax.transaction.Status;
 import org.jboss.arquillian.container.test.api.Deployment;
@@ -90,7 +90,9 @@ public class AnnotationInheritanceTest
 {
     @Deployment
     private static Archive<?> buildDeployment() {
-        return Deployments.buildWARWithPackageFriends(AnnotationInheritanceTest.class);
+        return new DeploymentBuilder(AnnotationInheritanceTest.class)
+                .addTestPackage()
+                .build();
     }
     
     

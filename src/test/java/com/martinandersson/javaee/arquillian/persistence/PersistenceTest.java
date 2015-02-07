@@ -1,7 +1,7 @@
 package com.martinandersson.javaee.arquillian.persistence;
 
 import com.martinandersson.javaee.resources.SchemaGenerationStrategy;
-import com.martinandersson.javaee.utils.Deployments;
+import com.martinandersson.javaee.utils.DeploymentBuilder;
 import java.util.List;
 import java.util.logging.Logger;
 import javax.ejb.EJB;
@@ -275,12 +275,10 @@ public class PersistenceTest
     
     @Deployment
     private static WebArchive buildDeployment() {
-        return Deployments.buildPersistenceArchive(
-                SchemaGenerationStrategy.UPDATE,
-                PersistenceTest.class,
-                PersonRepository.class,
-                Person.class,
-                Address.class);
+        return new DeploymentBuilder(PersistenceTest.class)
+                .addTestPackage()
+                .addPersistenceXMLFile(SchemaGenerationStrategy.UPDATE)
+                .build();
     }
     
     @EJB

@@ -1,13 +1,13 @@
 package com.martinandersson.javaee.cdi.qualifiers;
 
-import com.martinandersson.javaee.cdi.qualifiers.lib.Healthy;
-import com.martinandersson.javaee.cdi.qualifiers.lib.Caloric;
-import com.martinandersson.javaee.cdi.qualifiers.lib.Broccoli;
-import com.martinandersson.javaee.cdi.qualifiers.lib.Unhealthy;
-import com.martinandersson.javaee.cdi.qualifiers.lib.Meat;
-import com.martinandersson.javaee.cdi.qualifiers.lib.Water;
 import com.martinandersson.javaee.cdi.qualifiers.QualifierDriver.Report;
-import com.martinandersson.javaee.utils.Deployments;
+import com.martinandersson.javaee.cdi.qualifiers.lib.Broccoli;
+import com.martinandersson.javaee.cdi.qualifiers.lib.Caloric;
+import com.martinandersson.javaee.cdi.qualifiers.lib.Healthy;
+import com.martinandersson.javaee.cdi.qualifiers.lib.Meat;
+import com.martinandersson.javaee.cdi.qualifiers.lib.Unhealthy;
+import com.martinandersson.javaee.cdi.qualifiers.lib.Water;
+import com.martinandersson.javaee.utils.DeploymentBuilder;
 import com.martinandersson.javaee.utils.HttpRequests;
 import java.net.URL;
 import org.jboss.arquillian.container.test.api.Deployment;
@@ -29,23 +29,25 @@ public class QualifierTest
 {    
     @Deployment
     public static WebArchive buildDeployment() {
-        return Deployments.buildCDIBeanArchive(
+        return new DeploymentBuilder(QualifierTest.class)
+                .addEmptyBeansXMLFile()
+                .add(
+                  // Test class and driver
+                  QualifierTest.class,
+                  QualifierDriver.class,
                 
-                // Test class and driver
-                QualifierTest.class,
-                QualifierDriver.class,
+                  // Qualifiers
+                  Healthy.class,
+                  Unhealthy.class,
                 
-                // Qualifiers
-                Healthy.class,
-                Unhealthy.class,
+                  // Common bean type
+                  Caloric.class,
                 
-                // Common bean type
-                Caloric.class,
-                
-                // Caloric implementations
-                Water.class,
-                Broccoli.class,
-                Meat.class);
+                  // Caloric implementations
+                  Water.class,
+                  Broccoli.class,
+                  Meat.class)
+                .build();
     }
     
     @Test

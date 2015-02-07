@@ -1,8 +1,6 @@
 package com.martinandersson.javaee.utils;
 
-import com.martinandersson.javaee.resources.ArquillianDS;
 import com.martinandersson.javaee.resources.CDIInspector;
-import com.martinandersson.javaee.resources.SchemaGenerationStrategy;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -10,7 +8,6 @@ import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -18,18 +15,12 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
-import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.container.LibraryContainer;
 import org.jboss.shrinkwrap.api.container.ManifestContainer;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
-import org.jboss.shrinkwrap.api.spec.WebArchive;
-import org.jboss.shrinkwrap.resolver.api.maven.Maven;
 
 /**
- * API for building and manipulating deployments.<p>
- * 
- * All factories in this class <strong>log the archive</strong> contents using
- * {@code Level.INFO}.
+ * Utility API for deployments.
  * 
  * @author Martin Andersson (webmaster at martinandersson.com)
  */
@@ -37,146 +28,11 @@ public final class Deployments
 {
     private static final Logger LOGGER = Logger.getLogger(Deployments.class.getName());
     
-    
-    /*
-     * Next initialization uses Maven resolver to download the Java DB client.
-     * WildFly doesn't have this driver so we need to package the driver
-     * together with the deployments to make them work with Java DB.
-     * 
-     * In the future, you might also want to add more libraries such as
-     * "org.mockito:mockito-all:1.9.5" (server-side mocking! (note 1)). That
-     * would change the following code snippet to:
-     * 
-     *     JavaArchive[] libs = Maven.resolver().resolve(
-     *             "org.apache.derby:derbyclient:10.10.2.0",
-     *             "org.mockito:mockito-all:1.9.5")
-     *             .withTransitivity().as(JavaArchive.class);
-     * 
-     *     war.addAsLibraries(libs);
-     * 
-     * Read more: https://github.com/shrinkwrap/resolver
-     */
-    private static final JavaArchive DERBY_DRIVER = Maven.resolver()
-            .resolve("org.apache.derby:derbyclient:10.10.2.0")
-            .withTransitivity()
-            .asSingle(JavaArchive.class);
-    
-    
-    
     private Deployments() {
         // Empty
     }
     
     
-    
-    /*
-     *  -----------
-     * | FACTORIES |
-     *  -----------
-     */
-    
-    /**
-     * Will build an "explicit bean archive" that contains a {@code beans.xml}
-     * file, albeit empty.
-     * 
-     * @param testClass calling test class
-     * @param include which classes to include, may be none
-     * 
-     * @return the bean archive
-     * 
-     * @see com.martinandersson.javaee.cdi.packaging
-     */
-    public static WebArchive buildCDIBeanArchive(Class<?> testClass, Class<?>... include) {
-        WebArchive war = createWAR(testClass, include)
-                .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml");
-        
-        return log(war);
-    }
-    
-    /**
-     * Will build an archive that in addition to the provided classes, also
-     * include {@code ArquillianDS.class} (data source definition), the {@code
-     * persistence.xml} file (persistence unit configuration), a Java DB client
-     * diver which WildFly doesn't have and finally, an empty {@code beans.xml}
-     * file so that all classes become eligible for CDI lookup.
-     * 
-     * @param strategy strategy to use for schema generation
-     * @param testClass calling test class
-     * @param include which classes to include, may be none
-     * 
-     * @return the archive
-     */
-    public static WebArchive buildPersistenceArchive(SchemaGenerationStrategy strategy, Class<?> testClass, Class<?>... include) {
-        // Append datasource definition to the include list:
-        include = Arrays.copyOf(include, include.length + 1);
-        include[include.length - 1] = ArquillianDS.class;
-        
-        /*
-         * Instead of using ArquillianDS.class as a convenient way to add our
-         * data source definition. We could have included a deployment
-         * descriptor instead:
-         * 
-         *     war.addAsWebInfResource("web.xml");
-         * 
-         * A server specific configuration file can be added like so (note 2):
-         * 
-         *     war.addAsResource("wildfly-ds.xml", "META-INF/wildfly-ds.xml");
-         */
-        
-        WebArchive war = createWAR(testClass, include)
-                .addAsLibrary(DERBY_DRIVER)
-                .addAsResource(strategy.getFilename(), "META-INF/persistence.xml")
-                .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml");
-        
-        return log(war);
-    }
-    
-    /**
-     * WIll build a "POJO" WAR file that optionally include the provided classes.
-     * 
-     * @param testClass calling test class
-     * @param include which classes to include, may be none
-     * 
-     * @return the WAR archive
-     */
-    public static WebArchive buildWAR(Class<?> testClass, Class<?>... include) {
-        return log(createWAR(testClass, include));
-    }
-    
-    /**
-     * WIll build a "POJO" WAR file that optionally include the provided classes
-     * and all classes found in the packages that the classes belong to.
-     * Therefore, it is usually only necessary to provide one such
-     * "anchor"-class to include.<p>
-     * 
-     * This method also include package friends of the provided specified
-     * {@code testClass}.
-     * 
-     * @param testClass calling test class
-     * @param include classes to include, may be none
-     * 
-     * @return the WAR archive
-     */
-    public static WebArchive buildWARWithPackageFriends(Class<?> testClass, Class<?>... include) {
-        WebArchive war = createWAR(testClass);
-        
-        war.addPackage(testClass.getPackage());
-        
-        Stream.of(include)
-                .map(Class::getPackage)
-                .distinct()
-                .forEach(war::addPackage);
-        
-        return log(war);
-    }
-    
-    
-    
-    /*
-     *  ------------
-     * | EXTENSIONS |
-     *  ------------
-     */
     
     /**
      * Will install {@linkplain CDIInspector} as a CDI extension in the provided
@@ -283,10 +139,10 @@ public final class Deployments
      * 
      * @return the WAR archive
      */
-    private static WebArchive createWAR(Class<?> testClass, Class<?>... include) {
-        return ShrinkWrap.create(WebArchive.class, testClass.getSimpleName() + ".war")
-                .addClasses(include);
-    }
+//    private static WebArchive createWAR(Class<?> testClass, Class<?>... include) {
+//        return ShrinkWrap.create(WebArchive.class, testClass.getSimpleName() + ".war")
+//                .addClasses(include);
+//    }
     
     /**
      * Will log the contents of the provided archive using {@code Level.INFO}.
@@ -296,23 +152,10 @@ public final class Deployments
      * 
      * @return argument for chaining
      */
-    private static <T extends Archive> T log(T archive) {
-        LOGGER.info(() -> toString(archive));
-        return archive;
-    }
-    
-    /**
-     * Converts the contents of the provided archive to a String, paths
-     * separated with newlines.
-     * 
-     * @param <T> type of archive
-     * @param archive the archive to supposedly log
-     * 
-     * @return stringified archive
-     */
-    private static <T extends Archive<T>> String toString(T archive) {
-        return archive.toString(true).replace("\n", "\n\t");
-    }
+//    private static <T extends Archive> T log(T archive) {
+//        LOGGER.info(() -> toString(archive));
+//        return archive;
+//    }
     
     /**
      * Converts the contents of the provided archive to a Set, paths
@@ -328,21 +171,17 @@ public final class Deployments
     private static <T extends Archive<T>> Set<String> toSet(T archive) {
         return Stream.of(toString(archive).split("\n")).collect(Collectors.toSet());
     }
+    
+    /**
+     * Converts the contents of the provided archive to a String, paths
+     * separated with newlines.
+     * 
+     * @param <T> type of archive
+     * @param archive the archive to supposedly log
+     * 
+     * @return stringified archive
+     */
+    private static <T extends Archive<T>> String toString(T archive) {
+        return archive.toString(true).replace("\n", "\n\t");
+    }
 }
-
-
-
-/*
- * NOTES
- * -----
- * 
- * 1) In the Arquillian "Hello World" test, I argued that mocking should not be
- *    used in Arquillian. But mocking doesn't necessarily require the trade of a
- *    working implementation for a mock. One can also use mocking to try new and
- *    unwritten implementations of system components together with the rest of
- *    the application without having to write them first.
- * 
- * 2) Actually I would like to use the methods "addAsWebResource()" and
- *    "addAsManifestResource()" but they don't work properly, so the example
- *    provided go down a level and explicitly provide the path.
- */

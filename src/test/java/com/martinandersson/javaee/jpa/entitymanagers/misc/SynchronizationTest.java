@@ -1,12 +1,12 @@
 package com.martinandersson.javaee.jpa.entitymanagers.misc;
 
-import com.martinandersson.javaee.jpa.entitymanagers.lib.UnsynchronizedEM;
 import com.martinandersson.javaee.jpa.entitymanagers.EntityManagerExposer;
 import com.martinandersson.javaee.jpa.entitymanagers.lib.ContainerManagedTx;
 import com.martinandersson.javaee.jpa.entitymanagers.lib.Product;
 import com.martinandersson.javaee.jpa.entitymanagers.lib.Products;
+import com.martinandersson.javaee.jpa.entitymanagers.lib.UnsynchronizedEM;
 import com.martinandersson.javaee.resources.SchemaGenerationStrategy;
-import com.martinandersson.javaee.utils.Deployments;
+import com.martinandersson.javaee.utils.DeploymentBuilder;
 import com.martinandersson.javaee.utils.Lookup;
 import java.util.Objects;
 import java.util.logging.Logger;
@@ -67,15 +67,15 @@ public class SynchronizationTest
     
     @Deployment
     private static Archive<?> buildDeployment() {
-        return Deployments.buildPersistenceArchive(
-                SchemaGenerationStrategy.DROP_CREATE,
-                SynchronizationTest.class,
-                ContainerManagedTx.class,
-                UnsynchronizedEM.class,
-                EntityManagerExposer.class,
-                Lookup.class,
-                Product.class,
-                Products.class);
+        return new DeploymentBuilder(SynchronizationTest.class)
+                .addPersistenceXMLFile(SchemaGenerationStrategy.DROP_CREATE)
+                .add(ContainerManagedTx.class,
+                     UnsynchronizedEM.class,
+                     EntityManagerExposer.class,
+                     Lookup.class,
+                     Product.class,
+                     Products.class)
+                .build();
     }
     
     
@@ -178,7 +178,7 @@ public class SynchronizationTest
      * 
      * }</pre>
      * 
-     * Both GlassFish 4.1, WildFly 8.1.0 and WildFly 8.2.0 fail this test.
+     * GlassFish 4.1, WildFly 8.1.0 and WildFly 8.2.0 fail this test.
      * TODO: Report bugs.
      * 
      * @throws Throwable if all goes well

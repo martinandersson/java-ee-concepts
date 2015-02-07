@@ -1,7 +1,7 @@
 package com.martinandersson.javaee.jta.listeners.synchronizationregistry;
 
 import com.martinandersson.javaee.jta.listeners.synchronizationregistry.TestDriver.Report;
-import com.martinandersson.javaee.utils.Deployments;
+import com.martinandersson.javaee.utils.DeploymentBuilder;
 import com.martinandersson.javaee.utils.HttpRequests;
 import java.net.URL;
 import javax.transaction.Status;
@@ -34,10 +34,10 @@ public class SynchronizationRegistryTest
 {
     @Deployment
     private static Archive<?> buildDeployment() {
-        return Deployments.buildCDIBeanArchive(SynchronizationRegistryTest.class,
-                TestDriver.class,
-                ManagedBean.class,
-                TransactionalManagedBean.class);
+        return new DeploymentBuilder(SynchronizationRegistryTest.class)
+                .addEmptyBeansXMLFile()
+                .addTestPackage()
+                .build();
     }
     
     

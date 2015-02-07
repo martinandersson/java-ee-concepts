@@ -1,6 +1,6 @@
 package com.martinandersson.javaee.cdi.resolution;
 
-import com.martinandersson.javaee.utils.Deployments;
+import com.martinandersson.javaee.utils.DeploymentBuilder;
 import javax.enterprise.context.RequestScoped;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.ShouldThrowException;
@@ -90,9 +90,10 @@ public class GenericBeanUndeployableTest {
     @Deployment
     @ShouldThrowException // Should be: javax.enterprise.inject.spi.DefinitionException.class
     public static WebArchive buildDeployment() {
-        return Deployments.buildCDIBeanArchive(
-                GenericBeanUndeployableTest.class,
-                GenericBeanRequestScoped.class);
+        return new DeploymentBuilder(GenericBeanUndeployableTest.class)
+                .addEmptyBeansXMLFile()
+                .add(GenericBeanRequestScoped.class)
+                .build();
     }
     
     @Test // <-- implicitly @RunAsClient given that @ShouldThrowException is put on @Deployment

@@ -1,6 +1,6 @@
 package com.martinandersson.javaee.cdi.scope.application;
 
-import com.martinandersson.javaee.utils.Deployments;
+import com.martinandersson.javaee.utils.DeploymentBuilder;
 import com.martinandersson.javaee.utils.PhasedExecutorService;
 import javax.annotation.Resource;
 import javax.enterprise.concurrent.ManagedThreadFactory;
@@ -28,10 +28,11 @@ import org.junit.runner.RunWith;
 public class ApplicationScopedConcurrencyTest {
     @Deployment
     public static WebArchive buildDeployment() {
-        return Deployments.buildCDIBeanArchive(
-                ApplicationScopedConcurrencyTest.class,
-                ConcurrentInvocationCounter.class,
-                PhasedExecutorService.class);
+        return new DeploymentBuilder(ApplicationScopedConcurrencyTest.class)
+                .addEmptyBeansXMLFile()
+                .add(ConcurrentInvocationCounter.class,
+                     PhasedExecutorService.class)
+                .build();
     }
     
     @Inject

@@ -1,7 +1,7 @@
 package com.martinandersson.javaee.cdi.packaging;
 
 import com.martinandersson.javaee.cdi.packaging.lib.CalculatorUnAnnotated;
-import com.martinandersson.javaee.utils.Deployments;
+import com.martinandersson.javaee.utils.DeploymentBuilder;
 import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.ejb.Startup;
@@ -94,9 +94,10 @@ public class ImplicitPackageInvalidTest
     @Deployment
     @ShouldThrowException // <-- Should be: javax.enterprise.inject.spi.DeploymentException.class
     public static WebArchive buildDeployment() {
-        return Deployments.buildWAR(ImplicitPackageInvalidTest.class,
-                CalculatorUnAnnotated.class,
-                ForceBeanDiscovery.class);
+        return new DeploymentBuilder(ImplicitPackageInvalidTest.class)
+                .add(CalculatorUnAnnotated.class,
+                     ForceBeanDiscovery.class)
+                .build();
     }
     
     @Test // <-- implicitly @RunAsClient given that @ShouldThrowException is put on @Deployment

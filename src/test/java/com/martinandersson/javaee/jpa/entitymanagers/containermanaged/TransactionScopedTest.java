@@ -7,7 +7,7 @@ import com.martinandersson.javaee.jpa.entitymanagers.lib.ContainerManagedTx;
 import com.martinandersson.javaee.jpa.entitymanagers.lib.Product;
 import com.martinandersson.javaee.jpa.entitymanagers.lib.Products;
 import com.martinandersson.javaee.resources.SchemaGenerationStrategy;
-import com.martinandersson.javaee.utils.Deployments;
+import com.martinandersson.javaee.utils.DeploymentBuilder;
 import javax.ejb.EJB;
 import javax.ejb.EJBException;
 import javax.persistence.EntityManagerFactory;
@@ -96,15 +96,16 @@ public class TransactionScopedTest extends AbstractContainerManagedEntityManager
 {
     @Deployment
     private static Archive<?> buildDeployment() {
-        return Deployments.buildPersistenceArchive(SchemaGenerationStrategy.DROP_CREATE,
-                TransactionScopedTest.class,
-                AbstractContainerManagedEntityManagerTest.class,
-                AbstractJTAEntityManagerTest.class,
-                EntityManagerExposer.class,
-                ContainerManagedTx.class,
-                BeanManagedTx.class,
-                Product.class,
-                Products.class);
+        return new DeploymentBuilder(TransactionScopedTest.class)
+                .addPersistenceXMLFile(SchemaGenerationStrategy.DROP_CREATE)
+                .add(AbstractContainerManagedEntityManagerTest.class,
+                     AbstractJTAEntityManagerTest.class,
+                     EntityManagerExposer.class,
+                     ContainerManagedTx.class,
+                     BeanManagedTx.class,
+                     Product.class,
+                     Products.class)
+                .build();
     }
     
     

@@ -1,6 +1,6 @@
 package com.martinandersson.javaee.cdi.resolution;
 
-import com.martinandersson.javaee.utils.Deployments;
+import com.martinandersson.javaee.utils.DeploymentBuilder;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
@@ -34,10 +34,11 @@ public class BeanTypeResolutionTest {
     
     @Deployment
     public static WebArchive buildDeployment() {
-        return Deployments.buildCDIBeanArchive(
-                BeanTypeResolutionTest.class,
-                BeanTypeResolutionDriver.class,
-                SimpleCalculator.class);
+        return new DeploymentBuilder(BeanTypeResolutionTest.class)
+                .addEmptyBeansXMLFile()
+                .add(BeanTypeResolutionDriver.class,
+                     SimpleCalculator.class)
+                .build();
     }
     
     /**

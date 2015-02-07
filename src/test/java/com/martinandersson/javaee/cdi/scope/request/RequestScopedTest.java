@@ -1,6 +1,6 @@
 package com.martinandersson.javaee.cdi.scope.request;
 
-import com.martinandersson.javaee.utils.Deployments;
+import com.martinandersson.javaee.utils.DeploymentBuilder;
 import com.martinandersson.javaee.utils.HttpRequests.RequestParameter;
 import static com.martinandersson.javaee.utils.HttpRequests.getObject;
 import com.martinandersson.javaee.utils.PhasedExecutorService;
@@ -46,14 +46,9 @@ public class RequestScopedTest
     
     @Deployment
     public static WebArchive buildDeployment() {
-        // No beans.xml provided makes this deployment a "implicit bean archive":
-        return Deployments.buildWAR(
-                RequestScopedTest.class,
-                TestDriver1.class,
-                TestDriver2.class,
-                RequestScopedBean.class,
-                ApplicationScopedBean.class,
-                StatelessBean.class);
+        return new DeploymentBuilder(RequestScopedTest.class)
+                .addTestPackage()
+                .build();
     }
     
     

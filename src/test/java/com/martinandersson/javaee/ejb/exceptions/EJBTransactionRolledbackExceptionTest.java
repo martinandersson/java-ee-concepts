@@ -1,6 +1,6 @@
 package com.martinandersson.javaee.ejb.exceptions;
 
-import com.martinandersson.javaee.utils.Deployments;
+import com.martinandersson.javaee.utils.DeploymentBuilder;
 import javax.annotation.Resource;
 import javax.ejb.EJB;
 import javax.ejb.EJBException;
@@ -57,7 +57,9 @@ public class EJBTransactionRolledbackExceptionTest
 {
     @Deployment
     private static Archive<?> buildDeployment() {
-        return Deployments.buildWARWithPackageFriends(EJBTransactionRolledbackExceptionTest.class);
+        return new DeploymentBuilder(EJBTransactionRolledbackExceptionTest.class)
+                .add(CrashingBean.class)
+                .build();
     }
     
     @EJB

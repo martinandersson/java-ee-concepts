@@ -1,7 +1,7 @@
 package com.martinandersson.javaee.cdi.packaging;
 
 import com.martinandersson.javaee.cdi.packaging.lib.CalculatorRequestScoped;
-import com.martinandersson.javaee.utils.Deployments;
+import com.martinandersson.javaee.utils.DeploymentBuilder;
 import javax.inject.Inject;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
@@ -50,10 +50,11 @@ public class ImplicitPackageValidTest
 {
     @Deployment
     public static WebArchive buildDeployment() {
-        return Deployments.buildWAR(ImplicitPackageValidTest.class, CalculatorRequestScoped.class);
+        return new DeploymentBuilder(ImplicitPackageValidTest.class)
+                .add(CalculatorRequestScoped.class)
+                .build();
         
-        // Causes GF 4.1 to fail the test:
-//        return Deployments.installCDIInspector(war);
+        // Note: adding CDI inspector causes GF 4.1 to fail the test.
     }
 
     @Inject

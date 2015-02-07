@@ -1,9 +1,9 @@
 package com.martinandersson.javaee.cdi.alternatives;
 
+import com.martinandersson.javaee.cdi.alternatives.lib.DefaultUsernameService;
 import com.martinandersson.javaee.cdi.alternatives.lib.UnselectedUsernameService;
 import com.martinandersson.javaee.cdi.alternatives.lib.UsernameService;
-import com.martinandersson.javaee.cdi.alternatives.lib.DefaultUsernameService;
-import com.martinandersson.javaee.utils.Deployments;
+import com.martinandersson.javaee.utils.DeploymentBuilder;
 import com.martinandersson.javaee.utils.HttpRequests;
 import java.net.URL;
 import org.jboss.arquillian.container.test.api.Deployment;
@@ -35,12 +35,13 @@ public class UnselectedAlternativeTest
 {
     @Deployment
     public static WebArchive buildDeployment() {
-        return Deployments.buildCDIBeanArchive(
-                UnselectedAlternativeTest.class,
-                AlternativeDriver.class,
-                UsernameService.class,
-                DefaultUsernameService.class,
-                UnselectedUsernameService.class);
+        return new DeploymentBuilder(UnselectedAlternativeTest.class)
+                .addEmptyBeansXMLFile()
+                .add(AlternativeDriver.class,
+                     UsernameService.class,
+                     DefaultUsernameService.class,
+                     UnselectedUsernameService.class)
+                .build();
     }
     
     @Test

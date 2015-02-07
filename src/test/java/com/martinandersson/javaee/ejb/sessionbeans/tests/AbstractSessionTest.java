@@ -6,7 +6,7 @@ import com.martinandersson.javaee.ejb.sessionbeans.testdriver.ExecutionSettings;
 import com.martinandersson.javaee.ejb.sessionbeans.testdriver.Operation;
 import com.martinandersson.javaee.ejb.sessionbeans.testdriver.Report;
 import com.martinandersson.javaee.ejb.sessionbeans.testdriver.TestDriver;
-import com.martinandersson.javaee.utils.Deployments;
+import com.martinandersson.javaee.utils.DeploymentBuilder;
 import com.martinandersson.javaee.utils.HttpRequests;
 import com.martinandersson.javaee.utils.PhasedExecutorService;
 import java.net.URL;
@@ -25,10 +25,10 @@ abstract class AbstractSessionTest
 {
     @Deployment
     private static Archive<?> buildDeployment() {
-        return Deployments.buildWARWithPackageFriends(AbstractSessionTest.class,
-                TestDriver.class,
-                PhasedExecutorService.class,
-                AbstractSessionBean.class);
+        return new DeploymentBuilder(AbstractSessionTest.class)
+                .add(true, AbstractSessionBean.class, TestDriver.class)
+                .add(PhasedExecutorService.class)
+                .build();
     }
     
     private final EJBType type;
