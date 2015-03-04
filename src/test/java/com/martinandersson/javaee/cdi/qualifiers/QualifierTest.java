@@ -32,8 +32,7 @@ public class QualifierTest
         return new DeploymentBuilder(QualifierTest.class)
                 .addEmptyBeansXMLFile()
                 .add(
-                  // Test class and driver
-                  QualifierTest.class,
+                  // Driver
                   QualifierDriver.class,
                 
                   // Qualifiers

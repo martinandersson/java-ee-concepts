@@ -41,9 +41,8 @@ import org.junit.runner.RunWith;
  * <h3>Results</h3>
  * 
  * GlassFish and WildFly behave coherently enough as to not break the
- * specification. If the target bean inherited the transaction, then sure
- * enough, both servers will throw a {@code
- * EJBTransactionRolledbackException}.<p>
+ * specification. If the target bean inherited the transaction, then both
+ * servers will throw a {@code EJBTransactionRolledbackException}.<p>
  * 
  * Client code trying to find the real cause behind the problem must always dig
  * through all causes in the exception hierarchy until he find the furthermost
