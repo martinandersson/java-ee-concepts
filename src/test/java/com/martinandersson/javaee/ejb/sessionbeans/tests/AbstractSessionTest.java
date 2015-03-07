@@ -42,6 +42,6 @@ abstract class AbstractSessionTest
     
     protected final Report run(Operation operation) {
         ExecutionSettings settings = new ExecutionSettings(operation, type);
-        return HttpRequests.sendGetObject(url, TestDriver.class, settings);
+        return HttpRequests.sendGetObject(url, null, settings);
     }
 }

@@ -48,7 +48,7 @@ public class SynchronizationRegistryTest
     @RunAsClient
     @InSequence(1)
     public void __callDriver(@ArquillianResource URL url) {
-        report = HttpRequests.getObject(url, TestDriver.class);
+        report = HttpRequests.getObject(url);
     }
     
     

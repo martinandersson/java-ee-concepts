@@ -1,8 +1,8 @@
 package com.martinandersson.javaee.cdi.scope.request;
 
 import com.martinandersson.javaee.utils.DeploymentBuilder;
+import com.martinandersson.javaee.utils.HttpRequests;
 import com.martinandersson.javaee.utils.HttpRequests.RequestParameter;
-import static com.martinandersson.javaee.utils.HttpRequests.getObject;
 import com.martinandersson.javaee.utils.PhasedExecutorService;
 import java.net.URL;
 import java.util.List;
@@ -82,7 +82,7 @@ public class RequestScopedTest
     @RunAsClient
     @InSequence(1)
     public void resuseOfRequestScoped() {
-        final TestDriver1.Report report = getObject(url, TestDriver1.class);
+        final TestDriver1.Report report = HttpRequests.getObject(url, TestDriver1.class.getSimpleName());
         assertTestReport(report);
         firstRequestScopedBeanId = OptionalInt.of(report.servletInjectedRequestScopedId);
     }
@@ -98,7 +98,7 @@ public class RequestScopedTest
         final int firstRequestScopedBeanId = this.firstRequestScopedBeanId // <-- in this context (hiding a field), I really do feel that this.staticField instead of Type.staticField increase readability
                 .orElseThrow(AssertionError::new);
         
-        final TestDriver1.Report report = getObject(url, TestDriver1.class);
+        final TestDriver1.Report report = HttpRequests.getObject(url, TestDriver1.class.getSimpleName());
         assertTestReport(report);
         
         // The real deal:
@@ -135,7 +135,7 @@ public class RequestScopedTest
     @RunAsClient
     @InSequence(3)
     public void contextDoesNotPropagateAcrossAsynchronousEJB() {
-        final TestDriver2.Report report = getObject(url, TestDriver2.class);
+        final TestDriver2.Report report = HttpRequests.getObject(url, TestDriver2.class.getSimpleName());
         
         assertNotEquals("Expected that an asynchronous EJB call equals a new @RequestScoped bean.",
                 report.servletInjectedRequestScopedId, report.statelessOwnedRequestScopedId);
@@ -156,7 +156,7 @@ public class RequestScopedTest
         final PhasedExecutorService executor = new PhasedExecutorService();
         
         final RequestParameter sleep = new RequestParameter("sleep", "true");
-        Callable<TestDriver1.Report> task = () -> getObject(url, TestDriver1.class, sleep);
+        Callable<TestDriver1.Report> task = () -> HttpRequests.getObject(url, TestDriver1.class.getSimpleName(), sleep);
         
         List<TestDriver1.Report> reports = executor.invokeManyTimes(task, executor.getThreadCount()).stream()
                 .map(future -> {

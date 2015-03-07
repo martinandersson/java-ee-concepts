@@ -29,7 +29,7 @@ import javax.servlet.http.HttpServletResponse;
  * 
  * @author Martin Andersson (webmaster at martinandersson.com)
  */
-@WebServlet("/QualifierDriver")
+@WebServlet("")
 public class QualifierDriver extends HttpServlet
 {
     @Inject

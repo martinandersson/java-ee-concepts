@@ -17,7 +17,7 @@ import javax.servlet.http.HttpServletResponse;
  * 
  * @author Martin Andersson (webmaster at martinandersson.com)
  */
-@WebServlet("/AlternativeDriver")
+@WebServlet("")
 public class AlternativeDriver extends HttpServlet
 {
     @Inject

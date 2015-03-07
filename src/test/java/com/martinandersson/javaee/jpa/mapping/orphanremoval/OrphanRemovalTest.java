@@ -29,7 +29,9 @@ import org.junit.runner.RunWith;
  * 
  * Currently, the example provided by the Java EE 7 tutorial and tested in
  * {@linkplain #removeFromRelationshipWithOrphanRemoval_entityAlsoRemoved() removeFromRelationshipWithOrphanRemoval_entityAlsoRemoved()}
- * does not work on WildFly/Hibernate.
+ * does not work on WildFly/Hibernate.<p>
+ * 
+ * TODO: Report bug.
  * 
  * @author Martin Andersson (webmaster at martinandersson.com)
  */

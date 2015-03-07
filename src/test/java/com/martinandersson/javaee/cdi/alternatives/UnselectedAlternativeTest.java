@@ -47,7 +47,7 @@ public class UnselectedAlternativeTest
     @Test
     @RunAsClient
     public void unselectedAlternativeIsDeployableButNotUsed(@ArquillianResource URL url) {
-        AlternativeDriver.Report<?> report = HttpRequests.getObject(url, AlternativeDriver.class);
+        AlternativeDriver.Report<?> report = HttpRequests.getObject(url);
         
         assertEquals("Expected that the default username service would be used. The alternative has not been selected!",
                 DefaultUsernameService.class, report.beanType);

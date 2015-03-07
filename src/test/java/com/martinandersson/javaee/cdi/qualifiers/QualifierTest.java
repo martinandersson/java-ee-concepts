@@ -52,7 +52,7 @@ public class QualifierTest
     @Test
     @RunAsClient
     public void qualifierTest(@ArquillianResource URL url) {
-        Report<Class<? extends Caloric>> report = HttpRequests.getObject(url, QualifierDriver.class);
+        Report<Class<? extends Caloric>> report = HttpRequests.getObject(url);
         
         assertEquals("Expected that Water is the only @Default Caloric bean.",
                 Water.class, report.defaultType);

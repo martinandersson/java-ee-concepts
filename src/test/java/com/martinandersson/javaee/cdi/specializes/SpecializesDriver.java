@@ -19,7 +19,7 @@ import javax.servlet.http.HttpServletResponse;
  * 
  * @author Martin Andersson (webmaster at martinandersson.com)
  */
-@WebServlet("/SpecializesDriver")
+@WebServlet("")
 public class SpecializesDriver extends HttpServlet {
 
     @Inject

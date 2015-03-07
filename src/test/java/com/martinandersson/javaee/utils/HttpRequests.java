@@ -16,7 +16,6 @@ import java.util.Objects;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import javax.servlet.http.HttpServlet;
 
 /**
  * Procedures for making {@code HTTP/1.1} request to the test server.<p>
@@ -24,7 +23,13 @@ import javax.servlet.http.HttpServlet;
  * All requests made with this class are non-persistent, meaning that the header
  * {@code Connection: close} is included in the request sent to the server.
  * After receiving this header, HTTP compliant web servers must close the
- * connection after the response.
+ * connection after the response.<p>
+ * 
+ * Note that the underlying Java entity used to make HTTP requests by this
+ * class is {@code HttpURLConnection} which most likely uses pooled connections.
+ * Therefore, invoking these methods in a concurrent test has limited effects.
+ * Consider using a Socket instead (which we will add in this class in the
+ * future, or change the implementation of this method).<p>
  * 
  * @author Martin Andersson (webmaster at martinandersson.com)
  */
@@ -55,23 +60,30 @@ public final class HttpRequests
      * 
      * Otherwise (if the response matters), consider using
      * {@linkplain #getObject(URL, Class, HttpRequests.RequestParameter...)
-     * getObject(URL, Class, RequestParameter...)}.
+     * getObject(URL, String, RequestParameter...)}.
      * 
-     * Do note that the underlying Java entity used to make the GET-request is
-     * {@code HttpURLConnection} which most likely uses pooled connections.
-     * Therefore, invoking this method in a concurrent test has limited effects.
-     * Consider using a Socket instead (which we will add in this class in the
-     * future, or change the implementation of this method).
+     * A specified path is optional and may be {@code null} or the empty String.
+     * In this case, the deployed test servlet is mapped to be listening on the
+     * application context root <sup>1</sup> or mapped to be the default servlet
+     * of the application <sup>2</sup>. In both cases, it doesn't matter which
+     * path is added to the application context root as the target Servlet will
+     * become the target of the request.<p>
      * 
-     * @param url deployed application URL ("application context root"),
+     * <sup>1</sup> url pattern = "" <br>
+     * <sup>2</sup> url pattern = "/"
+     * 
+     * @param contextRoot
+     *            deployed application URL ("application context root"),
      *            provided by Arquillian
-     * @param testDriverType the test driver class
-     * @param parameters each parameter will be added to the GET-request
+     * @param path
+     *            path to servlet (may be {@code null} or empty)
+     * @param parameters
+     *            each parameter will be added to the GET-request
      * 
      * @return object returned by the test driver
      */
-    public static byte[] getBytes(URL url, Class<? extends HttpServlet> testDriverType, RequestParameter... parameters) {
-        final URLConnection conn = openNonPersistentConnection(url, testDriverType, parameters);
+    public static byte[] getBytes(URL contextRoot, String path, RequestParameter... parameters) {
+        final URLConnection conn = openNonPersistentConnection(contextRoot, path, parameters);
         
         try (InputStream in = conn.getInputStream()) {
             ByteArrayOutputStream buffer = new ByteArrayOutputStream();
@@ -90,25 +102,50 @@ public final class HttpRequests
     }
     
     /**
-     * Will make a GET-request to the provided Servlet test driver and return an
-     * expected Java object as response.<p>
+     * Shortcut for:
+     * {@linkplain #getObject(java.net.URL, java.lang.String, com.martinandersson.javaee.utils.HttpRequests.RequestParameter...) getObject(contextRoot, null)}.
      * 
-     * Do note that the underlying Java entity used to make the GET-request is
-     * {@code HttpURLConnection} which most likely uses pooled connections.
-     * Therefore, invoking this method in a concurrent test has limited effects.
-     * Consider using a Socket instead (which we will add in this class in the
-     * future, or change the implementation of this method).
+     * @param <T>
+     *            type of returned object
      * 
-     * @param <T> type of returned object
-     * @param url deployed application URL ("application context root"),
+     * @param contextRoot
+     *            deployed application URL ("application context root"),
      *            provided by Arquillian
-     * @param testDriverType the test driver class
-     * @param parameters each parameter will be added to the GET-request
      * 
      * @return object returned by the test driver
      */
-    public static <T> T getObject(URL url, Class<? extends HttpServlet> testDriverType, RequestParameter... parameters) { 
-        final URLConnection conn = openNonPersistentConnection(url, testDriverType, parameters);
+    public static <T> T getObject(URL contextRoot) {
+        return getObject(contextRoot, null);
+    }
+    
+    /**
+     * Will make a GET-request to the provided Servlet test driver and return an
+     * expected Java object as response.<p>
+     * 
+     * A specified path is optional and may be {@code null} or the empty String.
+     * In this case, the deployed test servlet is mapped to be listening on the
+     * application context root <sup>1</sup> or mapped to be the default servlet
+     * of the application <sup>2</sup>. In both cases, it doesn't matter which
+     * path is added to the application context root as the target Servlet will
+     * become the target of the request.<p>
+     * 
+     * <sup>1</sup> url pattern = "" <br>
+     * <sup>2</sup> url pattern = "/"
+     * 
+     * @param <T>
+     *            type of returned object
+     * @param contextRoot
+     *            deployed application URL ("application context root"),
+     *            provided by Arquillian
+     * @param path
+     *            path to servlet (may be {@code null} or empty)
+     * @param parameters
+     *            each parameter will be added to the GET-request
+     * 
+     * @return object returned by the test driver
+     */
+    public static <T> T getObject(URL contextRoot, String path, RequestParameter... parameters) { 
+        final URLConnection conn = openNonPersistentConnection(contextRoot, path, parameters);
         
         try (ObjectInputStream in = new ObjectInputStream(conn.getInputStream());) {
             return (T) in.readObject();
@@ -127,24 +164,28 @@ public final class HttpRequests
      * Will make a POST-request to the provided Servlet test driver and return an
      * expected Java object as response.<p>
      * 
-     * The POST body will contained the provided {@code toSend} object in his
+     * The POST body will contained the provided {@code toSend} object in its
      * binary form.<p>
      * 
      * This method is largely equivalent with {@linkplain
-     * #getObject(URL, Class, RequestParameter...)}.
+     * #getObject(URL, String, RequestParameter...)}.
      * 
-     * @param <T> type of returned object
-     * @param url deployed application URL ("application context root"),
+     * @param <T>
+     *            type of returned object
+     * @param contextRoot
+     *            deployed application URL ("application context root"),
      *            provided by Arquillian
-     * @param testDriverType the test driver class
-     * @param toSend serialized and put in body of the POST request
+     * @param path
+     *            path to servlet (may be {@code null} or empty)
+     * @param toSend
+     *            serialized and put in body of the POST request
      * 
      * @return object returned by the test driver
      */
-    public static <T> T sendGetObject(URL url, Class<? extends HttpServlet> testDriverType, Serializable toSend) {
+    public static <T> T sendGetObject(URL contextRoot, String path, Serializable toSend) {
         Objects.requireNonNull(toSend);
         
-        final HttpURLConnection conn = openNonPersistentConnection(url, testDriverType);
+        final HttpURLConnection conn = openNonPersistentConnection(contextRoot, path);
         
         try {
             conn.setRequestMethod("POST");
@@ -225,19 +266,20 @@ public final class HttpRequests
      * Will transform provided arguments into a {@code HttpURLConnection}
      * against the test Servlet.
      * 
-     * @param url application context root, as provided by Arquillian
-     * @param testDriverType test driver class
+     * @param contextRoot application context root, as provided by Arquillian
+     * @param path path to servlet (may be {@code null} or empty)
      * @param parameters optional request parameters
      * 
      * @return a connection against the test Servlet
      * 
      * @throws IllegalArgumentException if provided URL is not a HTTP URI
      */
-    private static HttpURLConnection openNonPersistentConnection(URL url, Class<? extends HttpServlet> testDriverType, RequestParameter... parameters) {
+    private static HttpURLConnection openNonPersistentConnection(URL contextRoot, String path, RequestParameter... parameters) {
+        final String query = RequestParameter.buildQuery(parameters);
+        
         try {
-            String query = RequestParameter.buildQuery(parameters);
-            URL testDriver = new URL(url, testDriverType.getSimpleName() + query);
-            HttpURLConnection conn = (HttpURLConnection) testDriver.openConnection();
+            URL url = new URL(contextRoot, (path == null ? "" : path) + query);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestProperty("Connection", "close");
             return conn;
         }

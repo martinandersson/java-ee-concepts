@@ -13,7 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * @author Martin Andersson (webmaster at martinandersson.com)
  */
-@WebServlet(urlPatterns = "/TestDriver")
+@WebServlet("")
 public class TestDriver extends HttpServlet
 {
     @Resource

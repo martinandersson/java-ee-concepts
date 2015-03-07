@@ -69,7 +69,7 @@ public class AlternativeTest
     @Test
     @RunAsClient
     public void selectedAlternativeIsUsed(@ArquillianResource URL url) {
-        AlternativeDriver.Report<?> report = HttpRequests.getObject(url, AlternativeDriver.class);
+        AlternativeDriver.Report<?> report = HttpRequests.getObject(url);
         
         assertEquals("Expected that the selected alternative would be used.",
                 PermissiveUsernameService.class, report.beanType);

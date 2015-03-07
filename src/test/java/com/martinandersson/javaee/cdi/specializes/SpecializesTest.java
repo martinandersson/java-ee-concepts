@@ -86,8 +86,8 @@ public class SpecializesTest
     @Test
     @RunAsClient
     @InSequence(1)
-    public void  __callDriver(@ArquillianResource URL url) {
-        report = HttpRequests.getObject(url, SpecializesDriver.class);
+    public void  before(@ArquillianResource URL url) {
+        report = HttpRequests.getObject(url);
     }
     
     @Test

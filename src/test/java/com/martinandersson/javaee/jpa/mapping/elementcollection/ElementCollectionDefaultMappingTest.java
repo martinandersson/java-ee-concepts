@@ -14,7 +14,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
- * Fails on WildFly/Hibernate (8.1.0 and 8.2.0).
+ * Fails on WildFly/Hibernate (8.1.0 and 8.2.0).<p>
+ * 
+ * TODO: Report bug.
  * 
  * @see com.martinandersson.javaee.jpa.mapping.elementcollection
  * 

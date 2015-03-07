@@ -34,7 +34,7 @@ import javax.servlet.http.HttpServletResponse;
  * 
  * @author Martin Andersson (webmaster at martinandersson.com)
  */
-@WebServlet("/TestDriver")
+@WebServlet("")
 public class TestDriver extends HttpServlet
 {
     private static final Logger LOGGER = Logger.getLogger(TestDriver.class.getName());
