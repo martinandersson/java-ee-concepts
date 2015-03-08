@@ -10,7 +10,6 @@ import org.jboss.arquillian.junit.InSequence;
 import org.jboss.arquillian.test.api.ArquillianResource;
 import org.jboss.shrinkwrap.api.Archive;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 import org.junit.Test;
@@ -23,7 +22,8 @@ import org.junit.runner.RunWith;
  * 
  * Also see:
  * <pre>{@code
- *     http://stackoverflow.com/questions/15067650
+ *     http://stackoverflow.com/q/15067650
+ *     http://stackoverflow.com/q/24822361
  * }</pre>
  * 
  * @author Martin Andersson (webmaster at martinandersson.com)
