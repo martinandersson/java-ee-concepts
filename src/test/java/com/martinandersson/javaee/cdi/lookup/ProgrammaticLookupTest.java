@@ -10,6 +10,7 @@ import org.jboss.arquillian.junit.InSequence;
 import org.jboss.arquillian.test.api.ArquillianResource;
 import org.jboss.shrinkwrap.api.Archive;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 import org.junit.Test;
@@ -39,8 +40,10 @@ public class ProgrammaticLookupTest
                 .build();
     }
     
-    static long requestScopedId;
-    static long applicationScopedId;
+    static long requestScopedId,
+                applicationScopedId,
+                dependentId1,
+                dependentId2;
     
     @ArquillianResource
     URL url;
@@ -52,17 +55,39 @@ public class ProgrammaticLookupTest
         
         requestScopedId = ids[0].get();
         applicationScopedId = ids[1].get();
+        dependentId1 = ids[2].get();
+        dependentId2 = ids[3].get();
         
         assertTrue(requestScopedId > 1);
         assertTrue(applicationScopedId > 1);
+        assertTrue(dependentId1 > 1);
+        assertTrue(dependentId2 > 1);
+        
+        
     }
     
     @Test
     @InSequence(2)
+    public void testDependent1MustNotBeDependent2() {
+        assertTrue("Each new lookup of a @Dependent should provide a new bean, ",
+                dependentId1 != dependentId2);
+    }
+    
+    @Test
+    @InSequence(3)
     public void testBeanIdsOfSecondRequest() {
         IdWrapper[] ids = HttpRequests.getObject(url);
         
-        assertNotEquals("One new request scoped bean per request, ", requestScopedId, ids[0].get());
-        assertEquals("Application scoped bean is a singleton, ", applicationScopedId, ids[1].get());
+        assertNotEquals("One new @RequestScoped bean per request, ",
+                requestScopedId, ids[0].get());
+        
+        assertEquals("@ApplicationScoped bean is a singleton, ",
+                applicationScopedId, ids[1].get());
+        
+        assertEquals("@Dependent 1 must not be replaced, ",
+                dependentId1, ids[2].get());
+        
+        assertEquals("@Dependent 2 must not be replaced, ",
+                dependentId2, ids[3].get());
     }
 }

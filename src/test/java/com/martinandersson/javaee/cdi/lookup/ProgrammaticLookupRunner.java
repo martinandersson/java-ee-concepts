@@ -18,12 +18,20 @@ public class ProgrammaticLookupRunner extends HttpServlet
     private final ApplicationScopedBean applicationScoped
             = CDI.current().select(ApplicationScopedBean.class).get();
     
+    private final DependentBean dependentBean1
+            = CDI.current().select(DependentBean.class).get();
+    
+    private final DependentBean dependentBean2
+            = CDI.current().select(DependentBean.class).get();
+    
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         try (ObjectOutputStream out = new ObjectOutputStream(resp.getOutputStream())) {
             out.writeObject(new IdWrapper[]{
                 new IdWrapper(requestScoped.getId()),
-                new IdWrapper(applicationScoped.getId())});
+                new IdWrapper(applicationScoped.getId()),
+                new IdWrapper(dependentBean1.getId()),
+                new IdWrapper(dependentBean2.getId())});
         }
     }
 }
