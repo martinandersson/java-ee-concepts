@@ -232,8 +232,7 @@ public class TestDriver extends HttpServlet
     }
     
     @PreDestroy
-    private void __removeStatefulBeans()
-    {
+    private void __removeStatefulBeans() {
         /*
          * The Servlet is the client of our two stateful beans, no one else. If
          * we want to tie the stateful beans to a particular user, then we must
