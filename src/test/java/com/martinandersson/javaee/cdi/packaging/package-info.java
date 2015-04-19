@@ -40,7 +40,10 @@
  * For <strong>implicit archives</strong>, CDI only manage beans that has an
  * explicit "bean defining annotation". This annotation is a scope type such as
  * {@linkplain javax.enterprise.context.RequestScoped @javax.enterprise.context.RequestScoped}.
- * WildFly 8.1.0 and my own understanding of all related Java EE
+ * <p>
+ * 
+ * In CDI 1.0, it was not apparent what exactly a "bean defining annotation"
+ * is. WildFly 8.1.0 and my own understanding of all related Java EE
  * specifications<sup>1</sup> also define the "base model" annotation
  * {@linkplain javax.annotation.ManagedBean @javax.annotation.ManagedBean} as
  * a "bean defining annotation". GlassFish however don't and will crash if one
@@ -50,10 +53,20 @@
  * implicit archives do. That is like totally inverted so one might think that
  * the expert group (many times referred to using the acronym "EG") behind the
  * specification were all high when they made up the archive definitions.
- * However, I think that the chosen terminology has to do with a possible
- * requirement of a {@code beans.xml} descriptor file. Explicit archives require
- * the file, implicit archives don't. That whole annotation-thing is probably
- * just an unfortunate mismatch.<p>
+ * Instead of making changes for the better, CDI 1.2 want to "add clarification"
+ * and by doing so, add yet another definition to the stack<sup>2</sup>:
+ * <pre>{@code
+ *     A bean class with a bean defining annotation is said to be an implicit
+ *     bean.
+ * }</pre>
+ * 
+ * All sane persons should agree that replacing magic with real annotations on a
+ * class make the bean "explicit" and not the other way around. However, I think
+ * that the chosen terminology has to do with the possible requirement of a
+ * {@code beans.xml} descriptor file. Explicit archives require the file,
+ * implicit archives don't. That whole annotation-thing is probably just an
+ * unfortunate mismatch. An error multiplied with the new term "implicit bean"
+ * added in CDI 1.2.<p>
  * 
  * You know by now the effects of the different archive types; whether or not
  * beans in these archives are discovered. Next, we'll dig deeper into what
@@ -70,7 +83,7 @@
  * <h3>The not a bean archive archive</h3>
  * 
  * A EAR package is not a "module", and can therefore not be a bean
- * archive<sup>2</sup>. A bean archive must be a JAR-, WAR- or RAR package.
+ * archive<sup>3</sup>. A bean archive must be a JAR-, WAR- or RAR package.
  * These files in turn may be packaged as modules within an EAR file which is
  * another thing.<p>
  * 
@@ -175,11 +188,11 @@
  * 
  * However, the {@code beans.xml} file cannot have "no version number" because
  * if the version attribute is left out, it defaults to version
- * "1.1"<sup>3</sup>. Furthermore, attribute {@code bean-discovery-mode} must be
- * specified because it is required by the XML schema definition<sup>3</sup>
+ * "1.1"<sup>4</sup>. Furthermore, attribute {@code bean-discovery-mode} must be
+ * specified because it is required by the XML schema definition<sup>4</sup>
  * (the specification says this attribute has a default value "annotated" which
  * is false). Version 1.0 of {@code beans.xml} do not define the attribute
- * {@code bean-discovery-mode}<sup>4</sup>. Adding that would be an error, at
+ * {@code bean-discovery-mode}<sup>5</sup>. Adding that would be an error, at
  * least if you stick to the old schema file which is exactly what you'll most
  * likely be doing if you use version 1.0.<p>
  * 
@@ -246,18 +259,24 @@
  * 
  * 
  * <h3>Note 2</h3>
+ * See section "2.5.1. Bean defining annotations" in:
+ * <pre>{@code
+ *     http://docs.jboss.org/cdi/spec/1.2/cdi-spec-1.2.pdf
+ * }</pre>
+ * 
+ * <h3>Note 3</h3>
  * See Java EE 7 specification (JSR-342) chapter EE.8 and CDI 1.1 specification
  * (JSR-346) section 5.1.
  * 
  * 
- * <h3>Note 3</h3>
+ * <h3>Note 4</h3>
  * See the XML schema definition file here:
  * <pre>{@code
  *     http://xmlns.jcp.org/xml/ns/javaee/beans_1_1.xsd
  * }</pre>
  * 
  * 
- * <h3>Note 4</h3>
+ * <h3>Note 5</h3>
  * See the XML schema definition file here:
  * <pre>{@code
  *     http://java.sun.com/xml/ns/javaee/beans_1_0.xsd
