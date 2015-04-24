@@ -13,7 +13,8 @@ import javax.transaction.Transactional;
 @Transactional
 @javax.annotation.ManagedBean
 public class TransactionalManagedBean {
-    private static final Logger LOGGER = Logger.getLogger(TransactionalManagedBean.class.getName());
+    private static final Logger LOGGER
+            = Logger.getLogger(TransactionalManagedBean.class.getName());
     
     @Resource(lookup = "java:comp/TransactionSynchronizationRegistry")
     TransactionSynchronizationRegistry txRegistry;
@@ -28,7 +29,9 @@ public class TransactionalManagedBean {
         return txRegistry.getTransactionStatus();
     }
     
-    public void registerListeners(IntConsumer beforeCompletionStatus, IntConsumer afterCompletionStatus) {
+    public void registerListeners(
+            IntConsumer beforeCompletionStatus, IntConsumer afterCompletionStatus)
+    {
         txRegistry.registerInterposedSynchronization(new Synchronization() {
 
             @Override public void beforeCompletion() {
@@ -39,5 +42,10 @@ public class TransactionalManagedBean {
                 afterCompletionStatus.accept(status);
             }
         });
+    }
+    
+    @Transactional(Transactional.TxType.NOT_SUPPORTED)
+    public int getTransactionStatusAfterSuspension() {
+        return txRegistry.getTransactionStatus();
     }
 }

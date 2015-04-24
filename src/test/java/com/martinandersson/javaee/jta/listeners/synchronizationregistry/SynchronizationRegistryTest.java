@@ -63,8 +63,8 @@ public class SynchronizationRegistryTest
     @RunAsClient
     @InSequence(2)
     public void managedBeanTXStatus() {
-        assertEquals("Expected that a non-transaction managed bean has no active transaction. Transaction status",
-                Status.STATUS_NO_TRANSACTION /* == 6 */, report.managedBeanTXStatus);
+        assertEquals("Expected that a non-transactional managed bean has no active transaction. Transaction status",
+                Status.STATUS_NO_TRANSACTION /* = 6 */, report.managedBeanTXStatus);
     }
     
     @Test
@@ -72,7 +72,7 @@ public class SynchronizationRegistryTest
     @InSequence(2)
     public void txManagedBeanTXStatus() {
         assertEquals("Expected that a @Transactional managed bean uses transactions. Transaction status",
-                Status.STATUS_ACTIVE /* == 0 */, report.txManagedBeanTXStatus);
+                Status.STATUS_ACTIVE /* = 0 */, report.txManagedBeanTXStatus);
     }
     
     @Test
@@ -80,7 +80,7 @@ public class SynchronizationRegistryTest
     @InSequence(2)
     public void txManagedBeanTXStatusBeforeCompletion() {
         assertEquals("Expected that before completion, transaction was active. Transaction status",
-                Status.STATUS_ACTIVE /* == 0 */, report.txManagedBeanTXStatusBeforeCompletion);
+                Status.STATUS_ACTIVE /* = 0 */, report.txManagedBeanTXStatusBeforeCompletion);
     }
     
     @Test
@@ -88,6 +88,14 @@ public class SynchronizationRegistryTest
     @InSequence(2)
     public void txManagedBeanTXStatusAfterCompletion() {
         assertEquals("Expected that after completion, transaction was committed. Transaction status",
-                Status.STATUS_COMMITTED /* == 3 */, report.txManagedBeanTXStatusAfterCompletion);
+                Status.STATUS_COMMITTED /* = 3 */, report.txManagedBeanTXStatusAfterCompletion);
+    }
+    
+    @Test
+    @RunAsClient
+    @InSequence(2)
+    public void txManagedBeanTXStatusAfterSuspension() {
+        assertEquals("Expected that after suspension, no transaction is active. Transaction status",
+                Status.STATUS_NO_TRANSACTION /* = 6 */, report.txManagedBeanTxStatusAfterSuspension);
     }
 }
