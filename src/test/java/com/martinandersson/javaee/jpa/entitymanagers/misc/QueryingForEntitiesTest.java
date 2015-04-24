@@ -237,7 +237,7 @@ public class QueryingForEntitiesTest
     
     /**
      * Firstly, as all previous test cases has shown, entities returned from the
-     * entity manager are NOT managed if they were queried after without using a
+     * entity manager are NOT managed if they were queried without using a
      * transaction.<p>
      * 
      * This test demonstrate the most basic JPA operations that a Java EE
@@ -257,8 +257,8 @@ public class QueryingForEntitiesTest
     /**
      * Continuing on the previously declared test case, this one demonstrate
      * that looking for many entities using queries instead of {@code
-     * EntityManager.find()} has the same outcome: all entities found and
-     * returned are managed.
+     * EntityManager.find()} has the same outcome: all entities found are
+     * managed.
      */
     @Test
     @InSequence(99)

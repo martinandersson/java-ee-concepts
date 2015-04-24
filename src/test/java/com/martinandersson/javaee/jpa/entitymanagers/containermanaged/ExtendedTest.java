@@ -51,10 +51,13 @@ import org.junit.Test;
  * persistence context of type extended. See
  * {@linkplain #extendedPersistenceContextPropagateToTransactional()}.<p>
  * 
- * The extended context itself can not be inherited from other beans, whether or
- * not the origin uses a transactional-scoped or extended persistence context.
- * There is one exception to this rule. See JavaDoc of
- * {@linkplain #persistenceContextCanNotPropagateIntoExtended()}.<p>
+ * The extended persistence context itself can not be inherited from other
+ * beans, whether or not the origin uses a transactional-scoped or extended
+ * persistence context. It is "created new" so to speak. But there is one
+ * exception to this rule. It is possible for a stateful bean that uses an
+ * extended persistence context to inherit an extended persistence context from
+ * another stateful bean if the latter bean is initialized within the scope of
+ * the former bean<sup>3</sup>.<p>
  * 
  * 
  * 
@@ -93,7 +96,12 @@ import org.junit.Test;
  * 
  * <h4>Note 2</h4>
  * 
- * See JPA 2.1, section "3.1.1 EntityManager Interface".
+ * See JPA 2.1, section "3.3 Persistence Context Lifetime and Synchronization
+ * Type".
+ * 
+ * 
+ * <h4>Note 3</h4>
+ * See JPA 2.1, section 7.6.3 "Container-managed Extended Persistence Context"
  * 
  * 
  * 

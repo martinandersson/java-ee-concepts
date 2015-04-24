@@ -76,7 +76,7 @@ import org.junit.runner.RunWith;
  * JPA 2.1, section "7.7 Application-managed Persistence Contexts"
  * <pre>{@code
  * 
- *     The EntityManagerFactory.setupEntityManager method and the EntityManager
+ *     The EntityManagerFactory.createEntityManager method and the EntityManager
  *     close and isOpen methods are used to manage the lifecycle of an
  *     application-managed entity manager and its associated persistence
  *     context.
@@ -102,9 +102,9 @@ import org.junit.runner.RunWith;
  * <pre>{@code
  * 
  *     When EntityManagerFactory.setupEntityManager is invoked, the provider
-     must create and return a new entity manager.
- 
- }</pre>
+ *     must create and return a new entity manager.
+ * 
+ * }</pre>
  * 
  * 
  * 

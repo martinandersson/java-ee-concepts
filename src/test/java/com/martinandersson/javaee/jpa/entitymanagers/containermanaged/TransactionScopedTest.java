@@ -31,13 +31,13 @@ import org.junit.Test;
  * context by default. Entity changes are flushed to database when the
  * transaction commit.<p>
  * 
- * The context of container-managed entity managers propagate to other
- * application components and their container-managed entity managers together
- * with the active JTA transaction<sup>2</sup> (independent of whether it was
- * the container or the bean that started the transaction).<p>
+ * The persistence context of container-managed entity managers propagate to
+ * other application components and their container-managed entity managers
+ * together with the active JTA transaction<sup>2</sup> (independent of whether
+ * it was the container or the bean that started the transaction).<p>
  * 
- * One exception to the rule do exist. A {@code @Stateful} bean that uses an
- * extended persistence context cannot be the target of such a propagation.
+ * ..but there is an exception to this rule. A {@code @Stateful} bean that uses
+ * an extended persistence context cannot be the target of such a propagation.
  * You'll find more test regarding this topic in {@linkplain ExtendedTest}<p>
  * 
  * 
