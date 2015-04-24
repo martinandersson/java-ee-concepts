@@ -1,6 +1,7 @@
 package com.martinandersson.javaee.utils;
 
 import java.io.ByteArrayOutputStream;
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
@@ -48,19 +49,23 @@ public final class HttpRequests
      */
     
     /**
+     * Shortcut for
+     * {@linkplain #getBytes(URL, String, RequestParameter...) getBytes(contextRoot, null)}.
+     * 
+     * @param contextRoot
+     *            deployed application URL ("application context root"),
+     *            provided by Arquillian
+     */
+    public static void ping(URL contextRoot) {
+        getBytes(contextRoot, null);
+    }
+    
+    /**
      * Will make a GET-request to the provided Servlet test driver and return
      * the raw response body as a {@code byte[]}.<p>
      * 
      * Servlets that do not respond with anything will make the client see a
      * a byte array of zero length.<p>
-     * 
-     * The purpose of this method is most likely to "ping" a Servlet; make him
-     * do stuff upon receiving a GET request. For this purpose, client code is
-     * not interested in raw bytes sent back.<p>
-     * 
-     * Otherwise (if the response matters), consider using
-     * {@linkplain #getObject(URL, Class, HttpRequests.RequestParameter...)
-     * getObject(URL, String, RequestParameter...)}.
      * 
      * A specified path is optional and may be {@code null} or the empty String.
      * In this case, the deployed test servlet is mapped to be listening on the
@@ -103,7 +108,7 @@ public final class HttpRequests
     
     /**
      * Shortcut for:
-     * {@linkplain #getObject(java.net.URL, java.lang.String, com.martinandersson.javaee.utils.HttpRequests.RequestParameter...) getObject(contextRoot, null)}.
+     * {@linkplain #getObject(URL, String, RequestParameter...) getObject(contextRoot, null)}.
      * 
      * @param <T>
      *            type of returned object
@@ -121,6 +126,8 @@ public final class HttpRequests
     /**
      * Will make a GET-request to the provided Servlet test driver and return an
      * expected Java object as response.<p>
+     * 
+     * If Servlet return nothing, {@code null} is returned.<p>
      * 
      * A specified path is optional and may be {@code null} or the empty String.
      * In this case, the deployed test servlet is mapped to be listening on the
@@ -149,6 +156,9 @@ public final class HttpRequests
         
         try (ObjectInputStream in = new ObjectInputStream(conn.getInputStream());) {
             return (T) in.readObject();
+        }
+        catch (EOFException e) {
+            return null;
         }
         catch (IOException e) {
             // Might be that you haven't packaged all dependent class files with the @Deployment?
@@ -221,8 +231,6 @@ public final class HttpRequests
         }
     }
     
-    
-
     
     
     public static class RequestParameter
