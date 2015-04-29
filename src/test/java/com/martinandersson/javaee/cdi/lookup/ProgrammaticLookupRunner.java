@@ -27,11 +27,11 @@ public class ProgrammaticLookupRunner extends HttpServlet
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         try (ObjectOutputStream out = new ObjectOutputStream(resp.getOutputStream())) {
-            out.writeObject(new IdWrapper[]{
-                new IdWrapper(requestScoped.getId()),
-                new IdWrapper(applicationScoped.getId()),
-                new IdWrapper(dependentBean1.getId()),
-                new IdWrapper(dependentBean2.getId())});
+            out.writeObject(new long[]{
+                requestScoped.getId(),
+                applicationScoped.getId(),
+                dependentBean1.getId(),
+                dependentBean2.getId()});
         }
     }
 }
