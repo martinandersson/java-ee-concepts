@@ -17,9 +17,9 @@ import org.junit.runner.RunWith;
 
 /**
  * The CDI specification does not say a word about the {@code Provider<T>}
- * interface. And the JavaDoc of {@code Provider<T>} is not very helpful either.
- * But this test will prove that {@code Provider<T>} return a contextual
- * (scoped) instance, just like {@code Instance<T>} do.<p>
+ * interface (defined by JSR-330). And the JavaDoc of {@code Provider<T>} is not
+ * very helpful either. But this test will prove that {@code Provider<T>} return
+ * a contextual (scoped) instance, just like {@code Instance<T>} do.<p>
  * 
  * CDI 1.2, section "5.6.1. The Instance interface":
  * <pre>{@code
