@@ -9,6 +9,9 @@ import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
 import java.io.UncheckedIOException;
+import java.net.CookieHandler;
+import java.net.CookieManager;
+import java.net.CookiePolicy;
 import java.net.HttpURLConnection;
 import java.net.ProtocolException;
 import java.net.URL;
@@ -49,6 +52,41 @@ public final class HttpRequests
      */
     
     /**
+     * Make all URL connections keep the server side session alive, on a best
+     * effort.<p>
+     * 
+     * The client will use a cookie handler that keep all cookies. This method
+     * will not reinstall an already installed cookie handler. If this method
+     * does not make an attempt to install the keep-all cookie handler, then
+     * {@code false} is returned.<p>
+     * 
+     * Client code is advised to wrap this call like so:
+     * 
+     * <pre>
+     * &#064;BeforeClass
+     * public static void keepSessionAlive() {
+     *     assertTrue(HttpRequests.keepSessionAlive());
+     * }
+     * </pre>
+     * 
+     * Even if this method return {@code true}, then that is no guarantee the
+     * session will be kept alive. Test code that depend on the session object
+     * and which fail should examine whether or not the session stays the same
+     * over many requests. For example, by using {@code HttpSession.getId()}.
+     * 
+     * @return {@code true} if a new cookie handler was installed, otherwise
+     *         {@code false}
+     */
+    public static boolean keepSessionAlive() {
+        if (CookieHandler.getDefault() == null) {
+            CookieHandler.setDefault(new CookieManager(null, CookiePolicy.ACCEPT_ALL));
+            return true;
+        }
+        
+        return false;
+    }
+    
+    /**
      * Shortcut for
      * {@linkplain #getBytes(URL, String, RequestParameter...) getBytes(contextRoot, null)}.
      * 
@@ -58,6 +96,18 @@ public final class HttpRequests
      */
     public static void ping(URL contextRoot) {
         getBytes(contextRoot, null);
+    }
+    
+    /**
+     * Shortcut for
+     * {@linkplain #getBytes(URL, String, RequestParameter...) getBytes(contextRoot, path)}.
+     * 
+     * @param contextRoot
+     *            deployed application URL ("application context root"),
+     *            provided by Arquillian
+     */
+    public static void ping(URL contextRoot, String path) {
+        getBytes(contextRoot, path);
     }
     
     /**
@@ -120,7 +170,24 @@ public final class HttpRequests
      * @return object returned by the test driver
      */
     public static <T> T getObject(URL contextRoot) {
-        return getObject(contextRoot, null);
+        return getObject(contextRoot, (String) null, (RequestParameter) null);
+    }
+    
+    /**
+     * Shortcut for:
+     * {@linkplain #getObject(URL, String, RequestParameter...) getObject(contextRoot, null, parameters)}.
+     * 
+     * @param <T>
+     *            type of returned object
+     * 
+     * @param contextRoot
+     *            deployed application URL ("application context root"),
+     *            provided by Arquillian
+     * 
+     * @return object returned by the test driver
+     */
+    public static <T> T getObject(URL contextRoot, RequestParameter... parameters) {
+        return getObject(contextRoot, null, parameters);
     }
     
     /**
@@ -245,6 +312,18 @@ public final class HttpRequests
         
         private final String key;
         private final String value;
+        
+        public <E extends Enum<E>> RequestParameter(E key, String value) {
+            this(key.name(), value);
+        }
+        
+        public <E extends Enum<E>> RequestParameter(String key, E value) {
+            this(key, value.name());
+        }
+        
+        public <E extends Enum<E>> RequestParameter(E key, E value) {
+            this(key.name(), value.name());
+        }        
         
         public RequestParameter(String key, String value) {
             if (WS_CHAR.matcher(key).find())
