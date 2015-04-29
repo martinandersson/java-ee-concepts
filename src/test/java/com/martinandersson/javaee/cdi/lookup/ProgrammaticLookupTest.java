@@ -35,7 +35,11 @@ public class ProgrammaticLookupTest
     @Deployment
     private static Archive<?> buildDeployment() {
         return new DeploymentBuilder(ProgrammaticLookupTest.class)
-                .addTestPackage()
+                .add(AbstractId.class,
+                     ApplicationScopedBean.class,
+                     DependentBean.class,
+                     RequestScopedBean.class,
+                     ProgrammaticLookupRunner.class)
                 .addEmptyBeansXMLFile()
                 .build();
     }
