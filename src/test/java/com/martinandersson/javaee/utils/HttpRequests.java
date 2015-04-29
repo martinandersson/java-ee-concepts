@@ -170,7 +170,7 @@ public final class HttpRequests
      * @return object returned by the test driver
      */
     public static <T> T getObject(URL contextRoot) {
-        return getObject(contextRoot, (String) null, (RequestParameter) null);
+        return getObject(contextRoot, (String) null);
     }
     
     /**
