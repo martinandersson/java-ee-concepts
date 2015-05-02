@@ -68,9 +68,9 @@ import org.junit.runner.RunWith;
  * calling {@code EntityManager.close()}. Both practices are a terrible thing to
  * do.<p>
  * 
- * The CDI 1.2 specification itself has a similar example (section 3.5.2).
- * Although the specification use a {@code @Dependent} scope, they still try to
- * close the entity manager in a disposer method.<p>
+ * The CDI 1.2 specification itself has a similar example (section
+ * 3.5.2)<sup>1</sup>. Although the specification use a {@code @Dependent}
+ * scope, they still try to close the entity manager in a disposer method.<p>
  * 
  * This code:
  * <pre>
@@ -195,7 +195,13 @@ import org.junit.runner.RunWith;
  * 
  * You may ask why I use a entity manager wrapper that is application scoped or
  * why I didn't just lookup the entity manager directly? Reason is that during
- * development, Weld ignored calls to destroy dependent objects.
+ * development, Weld ignored calls to destroy dependent objects.<p>
+ * 
+ * 
+ * 
+ * <h4>Note 1</h4>
+ * 
+ * https://issues.jboss.org/browse/CDI-523
  * 
  * 
  * 
