@@ -1,9 +1,11 @@
 package com.martinandersson.javaee.utils;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
@@ -16,6 +18,7 @@ import java.net.HttpURLConnection;
 import java.net.ProtocolException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -238,6 +241,36 @@ public final class HttpRequests
     }
     
     /**
+     * Will make a GET-request to the deployed Servlet test driver and return
+     * the response body as a {@code String} (lines separated with {@code
+     * System.lineSeparator()}.<p>
+     * 
+     * The deployed test servlet is assumed to be listening on the application
+     * context root <sup>1</sup> or mapped to be the default Servlet of the
+     * application <sup>2</sup>.<p>
+     * 
+     * <sup>1</sup> url pattern = "" <br>
+     * <sup>2</sup> url pattern = "/"
+     * 
+     * @param contextRoot deployed application URL ("application context root"),
+     *                    provided by Arquillian
+     * 
+     * @return the response body
+     */
+    public static String getText(URL contextRoot) {
+        final URLConnection conn = openNonPersistentConnection(contextRoot, null);
+        
+        try (InputStream raw = conn.getInputStream();
+             InputStreamReader chars = new InputStreamReader(raw, StandardCharsets.UTF_8);
+             BufferedReader reader = new BufferedReader(chars)) {
+             return reader.lines().collect(Collectors.joining(System.lineSeparator()));
+        }
+        catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
+    
+    /**
      * Will make a POST-request to the provided Servlet test driver and return an
      * expected Java object as response.<p>
      * 
@@ -268,7 +301,8 @@ public final class HttpRequests
             conn.setRequestMethod("POST");
         }
         catch (ProtocolException e) {
-            throw new AssertionError("POST is supported and yes, URLConnection is known to have a bad API design.", e);
+            throw new AssertionError(
+                    "POST is supported and yes, URLConnection is known to have a bad API design.", e);
         }
         
         conn.setDoOutput(true);
@@ -327,10 +361,12 @@ public final class HttpRequests
         
         public RequestParameter(String key, String value) {
             if (WS_CHAR.matcher(key).find())
-                throw new IllegalArgumentException("Whitespace found in key \"" + key + "\". Please percent-encode the key.");
+                throw new IllegalArgumentException(
+                        "Whitespace found in key \"" + key + "\". Please percent-encode the key.");
             
             if (WS_CHAR.matcher(value).find())
-                throw new IllegalArgumentException("Whitespace found in value: \"" + value + "\". Please percent-encode the value.");
+                throw new IllegalArgumentException(
+                        "Whitespace found in value: \"" + value + "\". Please percent-encode the value.");
             
             this.key = key;
             this.value = value;
@@ -361,7 +397,9 @@ public final class HttpRequests
      * 
      * @throws IllegalArgumentException if provided URL is not a HTTP URI
      */
-    private static HttpURLConnection openNonPersistentConnection(URL contextRoot, String path, RequestParameter... parameters) {
+    private static HttpURLConnection openNonPersistentConnection(
+            URL contextRoot, String path, RequestParameter... parameters)
+    {
         final String query = RequestParameter.buildQuery(parameters);
         
         try {
