@@ -4,7 +4,6 @@ import com.martinandersson.javaee.cdi.packaging.lib.CalculatorManagedBean;
 import com.martinandersson.javaee.cdi.packaging.lib.CalculatorRequestScoped;
 import com.martinandersson.javaee.cdi.packaging.lib.CalculatorUnAnnotated;
 import com.martinandersson.javaee.utils.DeploymentBuilder;
-import com.martinandersson.javaee.utils.Deployments;
 import javax.inject.Inject;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
@@ -33,14 +32,12 @@ public class ExplicitPackageTest
 {
     @Deployment
     public static WebArchive buildDeployment() {
-        WebArchive war = new DeploymentBuilder(ExplicitPackageTest.class)
+        return new DeploymentBuilder(ExplicitPackageTest.class)
                 .addEmptyBeansXMLFile()
                 .add(CalculatorUnAnnotated.class,
                      CalculatorManagedBean.class,
                      CalculatorRequestScoped.class)
                 .build();
-        
-        return Deployments.installCDIInspector(war);
     }
     
     
