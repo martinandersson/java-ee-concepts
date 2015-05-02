@@ -274,7 +274,7 @@ public class OracleTest
         assertTrue(two.jpaProxyRemainedOpen);
         
         /*
-         * Producer field was only injected once. The Oracle example exposes a
+         * Producer field was only injected once. The Oracle example expose a
          * entity manager reference to multiple threads despite the reference
          * not being required to be thread-safe:
          */
