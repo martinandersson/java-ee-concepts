@@ -180,10 +180,10 @@ import org.junit.runner.RunWith;
  * {@code @Default} qualifier. So, it is safe for you to ignore this type.<p>
  * 
  * This test class make a HTTP GET requests to a test Servlet ({@code
- * OracleTestDriver)). The Servlet will use two threads executed serially to
+ * OracleTestDriver}). The Servlet will use two threads executed serially to
  * do the same investigating job. The job will prove that both threads saw the
  * same JPA proxy reference and both of them caught an {@code
- * IllegalStateException} when the disposer method call {@code
+ * IllegalStateException} when the disposer method called {@code
  * EntityManager.close()}.<p>
  * 
  * Each job will begin by looking up an entity manager through a entity manager
