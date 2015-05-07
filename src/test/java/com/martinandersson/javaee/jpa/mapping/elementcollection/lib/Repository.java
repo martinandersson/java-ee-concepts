@@ -3,9 +3,11 @@ package com.martinandersson.javaee.jpa.mapping.elementcollection.lib;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Function;
 import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
-import javax.ejb.TransactionAttributeType;
+import static javax.ejb.TransactionAttributeType.REQUIRED;
+import static javax.ejb.TransactionAttributeType.SUPPORTS;
 import javax.persistence.EntityGraph;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -25,7 +27,7 @@ public class Repository
         em.persist(anything);
     }
     
-    @TransactionAttribute(TransactionAttributeType.SUPPORTS)
+    @TransactionAttribute(SUPPORTS)
     public <T> T findById(Class<? extends T> type, long id) {
         Map<String, Object> properties = Collections.EMPTY_MAP;
         try {
@@ -68,10 +70,24 @@ public class Repository
         return em.find(type, id, properties);
     }
     
-    @TransactionAttribute(TransactionAttributeType.SUPPORTS)
+    @TransactionAttribute(SUPPORTS)
     public void clearCaches() {
         em.clear(); // <-- unnecessarily without a transaction (EM is not extended, all entities on the outside of a TX is already detached)
         em.getEntityManagerFactory().getCache().evictAll();
+    }
+    
+    @TransactionAttribute(REQUIRED)
+    public void remove(Object entity) {
+        if (!em.contains(entity)) {
+            entity = em.merge(entity);
+        }
+        
+        em.remove(entity);
+    }
+    
+    @TransactionAttribute(REQUIRED)
+    public <T> T apply(Function<EntityManager, T> function) {
+        return function.apply(em);
     }
 }
 

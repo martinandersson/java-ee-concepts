@@ -17,7 +17,7 @@ import javax.persistence.Table;
  * @author Martin Andersson (webmaster at martinandersson.com)
  */
 @Entity
-@NamedEntityGraph(attributeNodes = @NamedAttributeNode("producers")) // <-- see comment in Repository.findById()
+@NamedEntityGraph(attributeNodes = @NamedAttributeNode("producers")) // <-- see comment in Repository.findById(Class, long)
 @Table(schema="JPA_MAPPING_ELEMENTCOLLECTION")
 public class Song
 {
