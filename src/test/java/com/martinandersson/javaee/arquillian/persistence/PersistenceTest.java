@@ -180,7 +180,7 @@ import org.junit.runner.RunWith;
  * well described here:
  * 
  * <pre>
- *     http://docs.oracle.com/javaee/7/tutorial/doc/persistence-intro003.htm
+ *     http://docs.oracle.com/javaee/7/tutorial/persistence-intro003.htm#JEETT01162
  * </pre>
  * 
  * 
