@@ -321,11 +321,10 @@
  * safe, then it is either 1) not shared by many entity managers or 2) access to
  * the persistence context is synchronized.<p>
  * 
- * The JPA specification does not restrict where an entity manager is used. From
- * the application developer's perspective, he <i>should</i> not have to
- * care.<p>
+ * The JPA specification does not restrict where an entity manager is used.<p>
  * 
- * Section "7.2.1. Obtaining an Entity Manager in the Java EE Environment":
+ * JPA 2.1, section "7.2.1. Obtaining an Entity Manager in the Java EE
+ * Environment":
  * <pre>{@code
  * 
  *     A container-managed entity manager is obtained by the application through
@@ -335,10 +334,34 @@
  *     transparently to the application.
  * }</pre>
  * 
+ * Nor does the umbrella specification restrict where an entity manager is used,
+ * as long as you inject the entity manager into a managed bean.<sup>5</sup><p>
+ * 
+ * Java Platform, Enterprise Edition Specification v7 (JSR-342), section
+ * "EE.5.14.1.1 Injection of Persistence Context References":
+ * <pre>{@code
+ * 
+ *     A field or a method of an application component may be annotated with the
+ *     PersistenceContext annotation.
+ * }</pre>
+ * 
+ * Managed Beans 1.0 (JSR-316), section "MB.2.1.3 Lifecycle and Resource
+ * Injection":
+ * <pre>{@code
+ * 
+ *     In a Java EE implementation, a Managed Bean may use any of the resource
+ *     injection functionality laid out in Chapter EE.5 of the Java EE Platform
+ *     specification, "Resources, Naming and Injection".
+ * }</pre>
+ * 
+ * The EJB specification allow all EJB:s to use a container-managed entity
+ * manager<sup>6</sup>. So from the application developer's perspective, he
+ * <i>should</i> not have to care and may inject the entity manager into a bean
+ * known by a Java EE container.<p>
+ * 
  * The entity manager has historically been something used on the inside of
  * enterprise Java beans. These are thread safe unless a {@code @Singleton} has
- * been configured differently. The EJB specification allow all EJB:s to use a
- * container-managed entity manager<sup>5</sup>. The application developer can
+ * been configured differently. . The application developer can
  * rest assured that whenever an entity manager is used by an EJB, he really
  * should not worry about a thing. Let the container manage the entity manager,
  * and you're all set.<p>
@@ -372,7 +395,7 @@
  * 
  * As far as object pooling goes, it is most likely that the component that
  * deals with inbound requests to the Java EE application is throttled by means
- * of a thread pool or a similar construct. Also, it is "typically"<sup>6</sup>
+ * of a thread pool or a similar construct. Also, it is "typically"<sup>7</sup>
  * the case that the database connections used is pooled as well. Overall, that
  * should translate to a limited use case for {@code @Stateless} beans in your
  * application. Why reduce the parallelism in your business layer if the layers
@@ -393,7 +416,7 @@
  * application-managed entity manager inherit a persistence context from someone
  * else. For application-managed entity managers, it is application code that
  * bear the responsibility of passing around the entity manager
- * reference<sup>7</sup>.<p>
+ * reference<sup>8</sup>.<p>
  * 
  * Most likely, there is a persistence context associated with the entity
  * manager. As the thread continuous his execution path into other components,
@@ -708,18 +731,23 @@
  * But it is much advised that you read through this entire page before going
  * elsewhere.
  * 
- * 
+ *  
  * <h4>Note 5</h4>
  * 
- * See EJB 3.2 specification, sections 4.6.2, 4.7.2, 4.8.6, 5.5.1 and 11.11.1.1.
+ * What is a managed bean? See {@linkplain com.martinandersson.javaee.cdi}.
  * 
  * 
  * <h4>Note 6</h4>
  * 
- * See JDBC specification 4.1, section 11.1.
+ * See EJB 3.2 specification, sections 11.11.1.1., 4.6.2, 4.7.2, 4.8.6, and 5.5.1.
  * 
  * 
  * <h4>Note 7</h4>
+ * 
+ * See JDBC specification 4.1, section 11.1.
+ * 
+ * 
+ * <h4>Note 8</h4>
  * 
  * Annotation {@code @PersistenceContext} can only inject container-managed
  * entity managers. Applications that want to use an application-managed entity

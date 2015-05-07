@@ -110,7 +110,7 @@ public class OracleTestDriver extends HttpServlet
             return reportHandoff.poll(3, TimeUnit.SECONDS);
         }
         catch (InterruptedException e) {
-            throw new RuntimeException("Someone don't want the report obviously.", e);
+            throw new RuntimeException("Someone doesn't want the report obviously.", e);
         }
     }
     
