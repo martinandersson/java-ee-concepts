@@ -160,7 +160,7 @@ import org.junit.runner.RunWith;
  * 
  * The semantics provided with this design is on par with how EJB 3.2 (JSR 345)
  * define "application exceptions". Unfortunately for us, it doesn't say what
- * exception the client may except on transaction failure.<p>
+ * exception the client may expect on transaction failure.<p>
  * 
  * An analogy can be made from section "3.4.7 Local and Global Transactions". In
  * this section, it is said that if the "resource adapter" (i.e, a JDBC driver)
@@ -247,21 +247,20 @@ import org.junit.runner.RunWith;
  * specification do not require the container to set the cause except for
  * {@code @MessageDriven} beans<sup>2</sup>.<p>
  * 
- * But, there's a twist to the tale. EJB 3.2 say that if the caller was in a
- * transaction context that the target EJB inherited, then the container must
- * not throw a {@code EJBException}. Instead, the container must throw a
+ * EJB 3.2 say that if the caller was in a transaction context that the target
+ * EJB inherited, then the container must throw a specialized EJBException:
  * {@code EJBTransactionRolledbackException}<sup>3</sup>. Why? Because the
  * container want the client to know that continuing the transaction is
  * "fruitless".<p>
  * 
  * One could argue - having the EJB specification in mind - that the CDI
  * container managing transactional CDI beans ought to throw some kind of
- * "poison" exception type to the client, letting him know that continuing the
- * transaction is fruitless. I find that adding such poison pills to the mix
- * only increase complexity. The client has a myriad of ways to find out whether
- * or not the transaction has been set to rollback. In case of
- * {@code @Transactional}, all unchecked exceptions rollback the transaction so
- * that's pritty obvious and easy to catch.<p>
+ * "poison" exception type to the client if the transaction was inherited,
+ * letting him know that continuing the transaction is fruitless. I find that
+ * adding such poison pills to the mix only increase complexity. The client has
+ * a myriad of ways to find out whether or not the transaction has been set to
+ * rollback. In case of {@code @Transactional}, all unchecked exceptions
+ * rollback the transaction so that's pritty obvious and easy to catch.<p>
  * 
  * GlassFish has erased all traces of the original cause, and that is not a good
  * thing. Also, GlassFish can not possibly think that throwing any of the
