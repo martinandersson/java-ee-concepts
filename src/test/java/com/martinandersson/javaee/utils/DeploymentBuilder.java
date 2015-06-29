@@ -61,6 +61,8 @@ public class DeploymentBuilder
     
     private final Class<?> test;
     
+    private final String fileNameSuffix;
+    
     private final Set<Class<?>> types;
     
     private final Set<Package> packages;
@@ -80,8 +82,30 @@ public class DeploymentBuilder
      * @param testClass test class using this builder
      */
     public DeploymentBuilder(Class<?> testClass) {
+        this(testClass, null);
+    }
+    
+    /**
+     * Initializes a new deployment builder.<p>
+     * 
+     * The archive's name will become the simple name of the specified test
+     * class.<p>
+     * 
+     * An optional prefix can be added to the file name. This feature is usable
+     * for tests that use multiple deployments (otherwise Arquillian will
+     * complain).
+     * 
+     * @param testClass
+     *            test class using this builder
+     * 
+     * @param warFileNameSuffix
+     *            suffix to be appended to the file name (may be {@code null} or
+     *            the empty string)
+     */
+    public DeploymentBuilder(Class<?> testClass, String warFileNameSuffix) {
         then = Instant.now();
         test = Objects.requireNonNull(testClass);
+        fileNameSuffix = warFileNameSuffix;
         types = new HashSet<>();
         packages = new HashSet<>();
     }
@@ -217,7 +241,11 @@ public class DeploymentBuilder
             throw new IllegalStateException("Deployment already built.");
         }
         
-        WebArchive war = ShrinkWrap.create(WebArchive.class, test.getSimpleName() + ".war");
+        String fileName = test.getSimpleName() +
+                (fileNameSuffix != null ? fileNameSuffix : "") +
+                ".war";
+        
+        WebArchive war = ShrinkWrap.create(WebArchive.class, fileName);
         
         types.forEach(war::addClass);
         packages.forEach(war::addPackage);
