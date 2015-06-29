@@ -46,7 +46,7 @@ import org.junit.runner.RunWith;
  * 
  * Client code trying to find the real cause behind the problem must always dig
  * through all causes in the exception hierarchy until he find the furthermost
- * cause set. That will always be an {@code ArithmeticException} in this case.
+ * cause set. In this case, that will always be an {@code ArithmeticException}.
  * Please see the individual test methods and comments therein.
  * 
  * @author Martin Andersson (webmaster at martinandersson.com)
@@ -57,12 +57,12 @@ public class EJBTransactionRolledbackExceptionTest
     @Deployment
     private static Archive<?> buildDeployment() {
         return new DeploymentBuilder(EJBTransactionRolledbackExceptionTest.class)
-                .add(CrashingBean.class)
+                .add(CrashingBean1.class)
                 .build();
     }
     
     @EJB
-    CrashingBean bean;
+    CrashingBean1 bean;
     
     @Resource
     UserTransaction tx;

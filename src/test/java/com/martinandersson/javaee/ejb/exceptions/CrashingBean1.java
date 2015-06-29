@@ -18,7 +18,7 @@ import javax.transaction.TransactionSynchronizationRegistry;
  * @author Martin Andersson (webmaster at martinandersson.com)
  */
 @Stateless
-public class CrashingBean
+public class CrashingBean1
 {
     @Resource
     TransactionSynchronizationRegistry reg;
