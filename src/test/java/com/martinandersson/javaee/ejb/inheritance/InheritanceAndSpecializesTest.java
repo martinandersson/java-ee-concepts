@@ -30,14 +30,19 @@ import org.junit.runner.RunWith;
  * to lookup A will cause ambiguity (crash). This result is the same for
  * GlassFish 4.1 and WildFly 9.0.0.CR1.<p>
  * 
- * If EJB C extends EJB A, but C also declare the CDI annotation
- * {@code @Specializes}, then C can be looked up using either @EJB or @Inject.
- * But trying to lookup A will make GlassFish crash while WildFly route the
- * call to a real instance of A. This result is unaffected by lookup method
- * used: @EJB or @Inject.<p>
+ * The result of the following case is independent of whether @EJB or @Inject is
+ * used.<p>
  * 
- * The lesson to be learned is that you should probably not specialize an EJB.
- * But if you do - like almost always - prefer @EJB over @Inject.
+ * If EJB C extends EJB A, but C also declare the CDI annotation
+ * {@code @Specializes}, then C can be looked up. But trying to lookup A will
+ * make GlassFish crash (something inside GlassFish has understood that A is
+ * supposed to be disabled) while WildFly route the call to an instance of A
+ * (ignoring that it was "specialized" by B).<p>
+ * 
+ * The lessons to be learned is 1) when you write EJB injection points, stick
+ * to @EJB. If you use @Inject, then new subclass additions in the future will
+ * brake your code. 2) Do not declare {@code @Specializes} on an EJB. It is not
+ * possible to properly specialize an EJB bean in GlassFish nor in WildFly.
  * 
  * @author Martin Andersson (webmaster at martinandersson.com)
  */
@@ -134,26 +139,44 @@ public class InheritanceAndSpecializesTest
      * The result is different between GlassFish 4.1 and WildFly 9.0.0.CR1.<p>
      * 
      * In GlassFish, class A is injected with a proxy. But if we try to
-     * dereference that proxy, then Weld crash with a NPE deep down the stack.<p>
+     * dereference that proxy, then Weld crash with a NPE deep down the
+     * stack<sup>2</sup>.<p>
      * 
      * WildFly inject a proxy to A <strong>and</strong> let us dereference the
      * reference to an instance of A.<p>
      * 
-     * It can therefore be said that GlassFish does what is expected
-     * by @Specializes (turning A into a disabled bean<sup>2</sup>), alas a bit
-     * too late. WildFly seem to reason that @Specializes is a CDI construct and
-     * won't bother about disabling A. It is business as usual.<p>
+     * It can therefore be said that GlassFish does to a certain extent what is
+     * expected by @Specializes (turning A into a disabled bean<sup>3</sup>),
+     * alas a bit too late. WildFly seem to reason that @Specializes is a CDI
+     * construct and won't bother about disabling A. It is business as usual.<p>
      * 
-     * It is not defined by the CDI- and EJB specification what should happen
-     * when using @EJB to lookup a @Specialized EJB. Thus both behaviors are
+     * None of the server did what was fully expected of the @Specializes
+     * annotation: Disable A <i>and</i> route the call to an instance of B.<p>
+     * 
+     * As far as I can tell, it is not defined by the CDI- and EJB specification
+     * what should happen when specializing EJB:s. Thus both behaviors are
      * accepted by this test.<p>
      * 
-     * TODO: File a CDI bug.
+     * TODO: File a CDI bug (actually, file an EJB bug and ask them to prune the
+     * spec).
      * 
      * <h4>Note 1</h4>
      * See {@linkplain com.martinandersson.javaee.cdi.specializes.SpecializesTest}.
      * 
      * <h4>Note 2</h4>
+     * 
+     * Here's what the client see:
+     * <pre>
+     * javax.ejb.EJBException: javax.ejb.EJBException: javax.ejb.CreateException: Could not create stateless EJB
+     *     Caused by: javax.ejb.EJBException: javax.ejb.CreateException: Could not create stateless EJB
+     *     Caused by: javax.ejb.CreateException: Could not create stateless EJB
+     *     Caused by: java.lang.reflect.InvocationTargetException
+     *     Caused by: java.lang.NullPointerException
+     *         ...
+     *         at com.sun.ejb.containers.BaseContainer.createEjbInstanceAndContext(BaseContainer.java:1696)
+     * </pre>
+     * 
+     * <h4>Note 3</h4>
      * In this particular use case. We have not tested what happens to CDI
      * observers and producer methods that could be declared in class A. Even
      * more so, I bet that life cycle callback methods et cetera is called on
