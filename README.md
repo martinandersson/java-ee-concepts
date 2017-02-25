@@ -15,7 +15,7 @@ Next stop, read:
 Required of you
 ---
 * JDK 8
-* Either GlassFish 4 or WildFly 8 installed and running (profiles included for both)
+* Latest and greatest versions of GlassFish and/or WildFly running (profiles included for both)
 
 Failing tests?
 ---
