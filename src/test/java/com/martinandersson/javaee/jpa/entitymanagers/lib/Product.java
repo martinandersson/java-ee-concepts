@@ -7,7 +7,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 /**
- * A dumb {@code @Entity} what represents a product.<p>
+ * A dumb {@code @Entity} that represents a product.<p>
  * 
  * Has only one field of interest: a name.
  * 
@@ -35,15 +35,15 @@ public class Product
         setName(name);
     }
     
-    public final long getId() {
+    public long getId() {
         return id;
     }
     
-    public final String getName() {
+    public String getName() {
         return name;
     }
     
-    public final void setName(String name) {
+    public void setName(String name) {
         this.name = name;
     }
 

@@ -38,7 +38,7 @@ import org.junit.runner.RunWith;
  * transactions. Issuing a SELECT statement doesn't require a transaction. What
  * did the developer have in mind rolling back? The result? =)<p>
  * 
- * Just remember that the entities fetched from the outside of a transaction,
+ * Just remember that the entities fetched from outside of a transaction,
  * <strong>will not be managed</strong>.<p>
  * 
  * This test suite will also have a look at {@linkplain FlushModeType}.
@@ -128,12 +128,18 @@ public class QueryingForEntitiesTest
      * 
      * }</pre>
      * 
-     * Both GlassFish 4.1 and WildFly 8.1.0 pass this test to a certain extent.
-     * They manage to lookup the entity, but for GlassFish, the "entity"
-     * returned is managed despite not using a transaction which is a clear
-     * violation of the specification.<p>
+     * WildFly 10.1.0 pass this test. It is noteworthy that WildFly does not
+     * eagerly load the Id of the entity. Trying to use {@code Product.getId()}
+     * will crash with this exception (nothing forbids an unmanaged entity from
+     * being able to traverse unloaded state, but WildFly/Hibernate clearly
+     * doesn't support it - at least for skeleton references):
+     * <pre>{@code
+     *     org.hibernate.LazyInitializationException: could not initialize proxy - no Session
+     * }</pre>
      * 
-     * Read more in source code comments.<p>
+     * GlassFish 4.1.1 will on the other hand give us the Id, but he also think
+     * the reference returned is <i>managed</i> which is a clear violation of
+     * the specification. Hence GlassFish does not pass this test.
      * 
      * TODO: File a GlassFish bug.<p>
      * 
@@ -158,36 +164,14 @@ public class QueryingForEntitiesTest
             Product p = em.getReference(Product.class, p1.getId());
             assertNotNull(p);
             
-            // If EntityNotFoundException hasn't been thrown already, it may happen now:
-            long id = p.getId();
-            
             /*
-             * So far, both GlassFish and WildFly survive which is a good thing.
-             * We managed to lookup the entity using getReference() without
-             * using a transaction. But what happens next is another story.
-             */
-            
-            /*
-             * Real id of p1 is 1 for both GlassFish and WildFly. Executing next
-             * statement, WildFly print 0 (bad) and GlassFish print 1 (good).
-             * 
-             * 1 is what we expected even for a "skeleton/proxy" like the
-             * reference returned from getReference().
-             * 
              * IIRC, it is said somewhere that the primary key must always be
              * fetched and shall under no circumstances be left out. Had a look
              * in the specification and couldn't find that so I dare not make
-             * an assertion about the load state in this context. However,
-             * because of a zeroed id, WildFly will fail
-             * findSingle_useTx_usingGetReference().
+             * an assertion about the load state of the Id.
              */
-            LOGGER.info(() -> "Id of product found using getReference(): " + id);
-            
-            /*
-             * But! According to the quote in the JavaDoc of this test, the
-             * returned reference must not be managed and here's where
-             * everything goes to hell for GlassFish.
-             */
+//            long id = p.getId();
+//            LOGGER.info(() -> "Id of product found using getReference(): " + id);
             
             boolean managed = em.contains(p);
             LOGGER.info(() -> "Product from getReference() is managed? " + managed); // WF: No. GF: Yeah sure!
@@ -271,13 +255,8 @@ public class QueryingForEntitiesTest
      * Using getReference() within a transaction, we expect to receive a managed
      * entity or at least one entity-like thing that has a traversable state.<p>
      * 
-     * GlassFish 4.1: pass.<br>
-     * WildFly 8.1.0 and 8.2.0: fail.<p>
-     * 
-     * This result is opposite of
-     * {@linkplain #findSingle_noTx_usingGetReference() findSingle_noTx_usingGetReference}.<p>
-     * 
-     * TODO: Report WildFly bug.<p>
+     * GlassFish 4.1.1: pass.<br>
+     * WildFly 10.1.0: pass.<p>
      * 
      * 
      * <h3>note:</h3>
@@ -292,10 +271,8 @@ public class QueryingForEntitiesTest
             Product p = em.getReference(Product.class, p1.getId());
             assertTrue(em.contains(p));
             
-            // WildFly's toString() actually print id = 1!
             LOGGER.info(() -> "Within a transaction, getReference() returned: " + p);
             
-            // But .. fail here* (returned id is zero):
             assertEquals(p1.getId(), p.getId());
             
             // *don't do .equals() with a proxy and a real product, Product.equals() use getClass().
